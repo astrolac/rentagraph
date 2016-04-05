@@ -1,0 +1,15 @@
+<?php
+class Base extends CI_Controller {
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->model('Users_model');
+        /*$this->load->helper('url_helper');*/
+    }
+
+    public function authorisation($slug = NULL)
+    {
+        $data['user'] = $this->Users_model->get_users($login);
+    }
+}
