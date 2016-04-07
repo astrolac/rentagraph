@@ -1,23 +1,30 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+/* Основная библиотека. */
 class Baselib {
 
+    /*
+        Объявим переменную, по требованию codeigniter,
+        для возможносто доступа к классам фреймворка.
+    */
     protected $CI;
 
     public function __construct()
     {
-        /*parent::__construct();*/
-
+        /* Получим ссылку для доступа к классам фреймворка. */
         $this->CI =& get_instance();
-
-        /* Загрузим модель таблицы с пользователями */
+        /* Загрузим модель таблицы с пользователями. */
         $this->CI->load->model('Users_model');
-
-        /*$this->load->helper('url_helper');*/
     }
 
+    /* Базовая функция. */
     public function basefun() {
+        /*
+            Сначала проверяем залогинен ли пользователь.
+            Если залогинен, загружаем данные о пользователе из сессии, формируем
+            $data для корректного отображения форм и вызываем формы.
+        */
         if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE) {
             $data['login'] = $_SESSION['login'];
             $data['logon'] = TRUE;
@@ -30,6 +37,10 @@ class Baselib {
 
             $this->CI->load->view('header', $data);
             $this->CI->load->view('footer', $data);
+        /*
+            Если не залогинен, формируем данныые для формы сообщения о
+            необходимости авторизации и вызываем соответствующие формы.
+        */
         } else {
             $data['title'] = 'basefun';
 

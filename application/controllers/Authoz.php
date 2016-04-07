@@ -1,23 +1,30 @@
 <?php
+/*
+    Контроллер авторизации пользователей.
+*/
 class Authoz extends CI_Controller {
 
     public function __construct()
     {
         parent::__construct();
-
         /* Загрузим модель таблицы с пользователями */
         $this->load->model('Users_model');
-
         /* Загрузим библиотеку сессий */
         $this->load->library('session');
-
+        /* Загрузим базовую библиотеку. */
         $this->load->library('baselib');
-        /*$this->load->helper('url_helper');*/
     }
 
-    /* Функция авторизации пользователя */
+    /*
+        Функция авторизации пользователя.
+    */
     public function authz()
     {
+        /*
+            Проверяем авторизован ли пользователь. Если нет, то готовим $data
+            и отображаем представление с формой для авторизации.
+            Если нет, то и суда нет.
+        */
         if(!isset($_SESSION['logon']) || $_SESSION['logon'] == FALSE) {
 
             $data['title'] = 'Авторизация';
@@ -34,6 +41,10 @@ class Authoz extends CI_Controller {
         }
     }
 
+    /*
+        Функция завершения сессии пользователя.
+        Штатно, рубим данные сессии и саму сессию закрываем.
+    */
     public function auth_end() {
         unset($_SESSION['login']);
         unset($_SESSION['username']);
@@ -43,6 +54,12 @@ class Authoz extends CI_Controller {
         $this->baselib->basefun();
     }
 
+    /*
+        Функция проверки введенных пользовательских данных.
+        Если логин и пользователь корректны, запоминаем данные о пользователе
+        в сессии и вызываем базовую функцию.
+        Если данные не корректны, запускаем функцию авторизации пользователя.
+    */
     public function auth_test() {
 
         $data = array(
@@ -50,7 +67,7 @@ class Authoz extends CI_Controller {
             'passfraze' => $this->input->post('passfraze')
         );
 
-        /* Получим данные о пользователе из БД */
+        /* Получим данные о пользователе из БД. */
         $userdb = $this->Users_model->get_users($data['login']);
 
         if($userdb['login'] == $data['login']
@@ -62,11 +79,6 @@ class Authoz extends CI_Controller {
             $this->baselib->basefun();
         } else {
             $this->authz();
-/*            $data['title'] = 'Ошибка авторизации! Повторите ввод данных!';
-            $this->load->helper('form');
-            $this->load->view('header', $data);
-            $this->load->view('auth_view', $data);
-            $this->load->view('footer', $data);*/
         }
     }
 }
