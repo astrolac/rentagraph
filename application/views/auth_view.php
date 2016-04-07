@@ -1,15 +1,9 @@
-<html>
-    <head>
-        <meta charset="utf-8" />
-        <!-- <link rel="stylesheet" href="videotest.css" type="text/css"> -->
-        <title>RentaGRAPH</title>
-    </head>
-    <body>
+    <div>
         <h2><?php echo $title; ?></h2>
 
         <?php /*echo validation_errors();*/ ?>
 
-        <?php echo form_open('auth_test'); ?>
+        <?php echo form_open('authoz/auth_test'); ?>
 
             <label for="login">Имя пользователя</label>
                 <input type="text" name="login" value="" size="20" /><br />
@@ -20,5 +14,5 @@
             <input type="submit" name="submit" value="Войти" />
 
         </form>
-    </body>
-</html>
+    </div>
+         

@@ -52,5 +52,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 /*$route['default_controller'] = 'welcome';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;*/
-$route['default_controller'] = 'Base/auth';
-$route['(:any)'] = 'Base/auth/$1';
+
+$route['authoz/auth_test'] = 'authoz/auth_test';
+$route['authoz/(:any)'] = 'authoz/authz/$1';
+/*$route['authoz/authz'] = 'authoz/authz';*/
+$route['authoz'] = 'authoz';
+$route['(:any)'] = 'Base/basefun/$1';
+$route['default_controller'] = 'base/basefun';

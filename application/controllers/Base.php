@@ -11,38 +11,26 @@ class Base extends CI_Controller {
         /* Загрузим библиотеку сессий */
         $this->load->library('session');
 
+        $this->load->library('baselib');
+
         /*$this->load->helper('url_helper');*/
     }
 
-    /* Функция авторизации пользователя */
-    public function auth()
-    {
-        if(!isset($_SESSTION['login'])) {
-
-            $data['title'] = 'Авторизация';
-            $this->load->helper('form');
-
-            /*$this->load->library('form_validation');
-
-            $this->form_validation->set_rules('title', 'Title', 'required');
-            $this->form_validation->set_rules('text', 'Text', 'required');*/
-
-            $this->load->view('auth_view', $data);
-
+    public function basefun() {
+        $this->baselib->basefun();
+        /*if(!isset($_SESSION['login'])) {
+            $data['title'] = 'basefun';
+            $this->load->view('header', $data);
+            $this->load->view('authatata', $data);
+            $this->load->view('footer', $data);
         } else {
-            $data['title'] = '';
-            $login = $_SESSTION['login'];
-            $data['user'] = $this->Users_model->get_users($login);
-        }
-    }
+            $data['login'] = $_SESSION['login'];
+            $data['username'] = $_SESSION['username'];
+            $data['roleid'] = $_SESSION['roleid'];
 
-    public function auth_test()
-    {
+            $this->load->view('header', $data);
 
-        $data = array(
-            'login' => $this->input->post('login'),
-            'passfraze' => $this->input->post('passfraze')
-        );
-
+            $this->load->view('footer', $data);
+        }*/
     }
 }
