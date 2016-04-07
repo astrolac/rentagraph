@@ -6,7 +6,7 @@ class Base extends CI_Controller {
         parent::__construct();
 
         /* Загрузим модель таблицы с пользователями */
-        $this->load->model('Users_model');
+        /*$this->load->model('Users_model');*/
 
         /* Загрузим библиотеку сессий */
         $this->load->library('session');
@@ -18,19 +18,5 @@ class Base extends CI_Controller {
 
     public function basefun() {
         $this->baselib->basefun();
-        /*if(!isset($_SESSION['login'])) {
-            $data['title'] = 'basefun';
-            $this->load->view('header', $data);
-            $this->load->view('authatata', $data);
-            $this->load->view('footer', $data);
-        } else {
-            $data['login'] = $_SESSION['login'];
-            $data['username'] = $_SESSION['username'];
-            $data['roleid'] = $_SESSION['roleid'];
-
-            $this->load->view('header', $data);
-
-            $this->load->view('footer', $data);
-        }*/
     }
 }

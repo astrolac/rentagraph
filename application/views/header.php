@@ -6,16 +6,6 @@
     </head>
     <body>
         <div>
-            <?php
-                if(!isset($login)) { ?>
-                    <a href="
-                      <?php echo $this->config->item('base_url')."#$%"; ?>
-                      idex.php/Authoz/authz">Войти</a>
-             <?php   } else {
-                    echo $username." [".$login."] "; ?>
-                    <a href="
-                      <?php echo $this->config->item('base_url')."#$%"; ?>
-                      index.php/Authoz/authz">Выход</a>
-             <?php
-                } ?>
+            <?php echo $rightmsg; ?>
+            <a href="<?php echo $righthref; ?>"><?php echo $righthreftext; ?></a>
         </div>

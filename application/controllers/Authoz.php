@@ -16,60 +16,57 @@ class Authoz extends CI_Controller {
     }
 
     /* Функция авторизации пользователя */
-    public function authz($tryToAuth = FALSE)
+    public function authz()
     {
-        if(!isset($_SESSION['login'])) {
+        if(!isset($_SESSION['logon']) || $_SESSION['logon'] == FALSE) {
 
-            if($tryToAuth === FALSE) {
-                $data['title'] = 'Авторизация';
-            } else {
-                $data['title'] = 'Ошибка авторизации! Повторите ввод логина и пароля.';
-            }
+            $data['title'] = 'Авторизация';
+
+            $data['rightmsg'] = "";
+            $data['righthref'] = $this->config->item('base_url')."index.php/Authoz/authz/";
+            $data['righthreftext'] = "Войти";
+
             $this->load->helper('form');
-
-            /*$this->load->library('form_validation');
-
-            $this->form_validation->set_rules('title', 'Title', 'required');
-            $this->form_validation->set_rules('text', 'Text', 'required');*/
 
             $this->load->view('header', $data);
             $this->load->view('auth_view', $data);
             $this->load->view('footer', $data);
-
-        } else {
-            unset($_SESSION['login']);
-            $this->session->sess_destroy();
-            $this->baselib->basefun();
-            /*$data['title'] = '';
-            $login = $_SESSION['login'];
-            $data['user'] = $this->Users_model->get_users($login);*/
         }
     }
 
-    public function auth_test()
-    {
-        $this->load->helper('form');
+    public function auth_end() {
+        unset($_SESSION['login']);
+        unset($_SESSION['username']);
+        unset($_SESSION['roleid']);
+        $_SESSION['logon'] = FALSE;
+        $this->session->sess_destroy();
+        $this->baselib->basefun();
+    }
 
-        /* Получим переданные данные о логине и пароле */
+    public function auth_test() {
+
         $data = array(
             'login' => $this->input->post('login'),
             'passfraze' => $this->input->post('passfraze')
         );
 
-        /* Проверим есть ли логин в базе пользователей */
+        /* Получим данные о пользователе из БД */
         $userdb = $this->Users_model->get_users($data['login']);
 
-        if(!isset($userdb['login'])) {
-            $this->authz(TRUE);
-        } elseif($userdb['login'] == $data['login']
+        if($userdb['login'] == $data['login']
                  && password_verify($data['passfraze'], $userdb['passfraze'])) {
             $_SESSION['login'] = $userdb['login'];
+            $_SESSION['logon'] = TRUE;
             $_SESSION['username'] = $userdb['username'];
             $_SESSION['roleid'] = $userdb['roleid'];
             $this->baselib->basefun();
         } else {
-            $this->authz(TRUE);
+            $this->authz();
+/*            $data['title'] = 'Ошибка авторизации! Повторите ввод данных!';
+            $this->load->helper('form');
+            $this->load->view('header', $data);
+            $this->load->view('auth_view', $data);
+            $this->load->view('footer', $data);*/
         }
     }
-
 }
