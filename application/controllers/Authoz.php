@@ -46,12 +46,14 @@ class Authoz extends CI_Controller {
         Штатно, рубим данные сессии и саму сессию закрываем.
     */
     public function auth_end() {
-        unset($_SESSION['login']);
-        unset($_SESSION['username']);
-        unset($_SESSION['roleid']);
-        $_SESSION['logon'] = FALSE;
-        $this->session->sess_destroy();
-        $this->baselib->basefun();
+        if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE) {
+            unset($_SESSION['login']);
+            unset($_SESSION['username']);
+            unset($_SESSION['roleid']);
+            $_SESSION['logon'] = FALSE;
+            $this->session->sess_destroy();
+            $this->baselib->basefun();
+        }
     }
 
     /*
@@ -61,12 +63,12 @@ class Authoz extends CI_Controller {
         Если данные не корректны, запускаем функцию авторизации пользователя.
     */
     public function auth_test() {
-
+      if(!isset($_SESSION['logon']) || $_SESSION['logon'] == FALSE) {
+        /* Сформируме массив с переданными данными о имени пользователя и пароле. */
         $data = array(
             'login' => $this->input->post('login'),
             'passfraze' => $this->input->post('passfraze')
         );
-
         /* Получим данные о пользователе из БД. */
         $userdb = $this->Users_model->get_users($data['login']);
 
@@ -80,5 +82,6 @@ class Authoz extends CI_Controller {
         } else {
             $this->authz();
         }
+      }
     }
 }

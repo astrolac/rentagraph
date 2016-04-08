@@ -1,0 +1,80 @@
+#header {
+  font-family: Calibri, Helvetica, Verdana, Arial;
+  font-weight: bold;
+  font-size: 14pt;
+  border-bottom: 1px dashed #000000;
+  padding: 0;
+  margin: 0;
+  background: white;
+  width: 100%;
+  overflow: auto;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#header h1 {
+  font-size: 12pt;
+  float: left;
+  margin: 0;
+  padding: 0;
+}
+
+#header .info {
+  font-size: 10pt;
+  position: absolute;
+  right: 5px;
+}
+
+.central {
+  font-family: Calibri, Helvetica, Verdana, Arial;
+  font-weight: bold;
+  font-size: 14pt;
+  padding: 0;
+  margin: 0;
+  background: white;
+  width: 100%;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.auth {
+  font-family: Calibri, Helvetica, Verdana, Arial;
+  font-weight: bold;
+  font-size: 12pt;
+  padding: 0;
+  margin: 0;
+  background: white;
+  width: 100%;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.dform {
+    font-size: 10pt;
+}
+
+.tform {
+    font-family: Calibri, Helvetica, Verdana, Arial;
+    font-size: 10pt;
+    /*border: 1px solid black;*/
+    margin: 5px auto;
+}
+
+td.label {
+    font-weight: bold;
+    padding: 5px 5px;
+    text-align: right;
+}
+
+td.input {
+    font-weight: bold;
+    padding: 5px 5px;
+    text-align: left;
+}
+
+td.button {
+    font-weight: normal;
+    padding: 5px 5px;
+    width: 100%;
+    text-align: center;
+}
