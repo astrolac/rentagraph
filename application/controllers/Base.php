@@ -19,4 +19,9 @@ class Base extends CI_Controller {
     public function basefun() {
         $this->baselib->basefun();
     }
+
+    public function hotelsmaintain() {
+      ;
+    }
+
 }

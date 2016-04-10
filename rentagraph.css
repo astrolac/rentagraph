@@ -78,3 +78,72 @@ td.button {
     width: 100%;
     text-align: center;
 }
+
+/*
+    стили для главного меню
+    взяты отсюда http://sitear.ru/material/gorizontalnoe-vypadayushchee-menyu-na-jquery
+*/
+#mainmenu,
+#mainmenu ul {
+    list-style: none;
+}
+#mainmenu {
+    float: left;
+}
+#mainmenu > li {
+    float: left;
+
+    display: block;
+    height: 2em;
+    line-height: 2em;
+    padding: 0 1.5em;
+    text-decoration: none;
+}
+#mainmenu li a {
+    display: block;
+    height: 2em;
+    line-height: 2em;
+    padding: 0 1.5em;
+    text-decoration: none;
+}
+#mainmenu ul {
+    position: absolute;
+    display: none;
+    z-index: 999;
+}
+#mainmenu ul li a {
+    width: 200px;
+}
+#mainmenu li:hover ul {
+    display: block;
+}
+
+/* Main menu
+------------------------------------------*/
+#mainmenu {
+    font-family: Calibri, Helvetica, Verdana, Arial;
+    font-size: 12px;
+    background: #2f8be8;
+}
+#mainmenu > li > a {
+    color: #fff;
+    font-weight: bold;
+}
+#mainmenu > li:hover > a {
+    background: #f09d28;
+    color: #000;
+}
+/* Submenu
+------------------------------------------*/
+#mainmenu ul {
+    background: #f09d28;
+}
+#mainmenu ul li a {
+    color: #000;
+}
+#mainmenu ul li:hover a {
+    background: #ffc97c;
+}
+/*
+--------------------------------------------------------------------------------
+*/
