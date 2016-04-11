@@ -1,3 +1,4 @@
+<div class="emptycontainer">
 <div class="mainmenu">
     <ul id="mainmenu">
 
@@ -7,7 +8,6 @@
             foreach ($inarr as $key => $value) {
                 if (is_array($value)) {
                     echo "<li><a href=\"#\">".$key."</a>";
-                    /*echo "<li>".$key;*/
                     echoarr($value);
                     echo "</li>";
                 } else {
@@ -19,10 +19,16 @@
         ?>
 
         <?php
+        /*
+            Здесь, запускаем в цикле перебор массива с пунктами меню.
+            Функция выше запускает перебор переданного ей массива.
+            Для вложенных массивов использует рекурсию.
+            Можно было бы обойтись и просто самой функцией, без этого цикла, но
+            у главного списка есть id, а у вложенных его нет.
+        */
         foreach ($mainmenuarray as $menuname => $menuhref) {
             if (is_array($menuhref)) {
                 echo "<li><a href=\"#\">".$menuname."</a>";
-                /*echo "<li>".$menuname;*/
                 echoarr($menuhref);
                 echo "</li>";
             } else {
@@ -32,4 +38,5 @@
         ?>
 
     </ul>
+</div>
 </div>

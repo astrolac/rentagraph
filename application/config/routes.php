@@ -53,6 +53,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;*/
 
+$route['base/hotelsadd_job'] = 'base/hotelsadd_job';
+$route['base/hotelsadd'] = 'base/hotelsadd';
+$route['base/hotelsmaintain'] = 'base/hotelsmaintain';
 $route['authoz/auth_test'] = 'authoz/auth_test';
 $route['authoz/(:any)'] = 'authoz/authz/$1';
 /*$route['authoz/authz'] = 'authoz/authz';*/
