@@ -7,6 +7,9 @@
     <body>
         <div id="header">
               <h1>RentaGRAPH</h1>
+              <div class="title">
+                  <?php /*echo $title;*/ ?>
+              </div>
               <div class="info">
                 <?php echo $rightmsg; ?>
                 <a href="<?php echo $righthref; ?>"><?php echo $righthreftext; ?></a>

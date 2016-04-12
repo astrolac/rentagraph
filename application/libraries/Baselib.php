@@ -29,8 +29,8 @@ class Baselib {
         $menuArray = array (
             'Бронирование' =>
                 array (
-                    'Забронировать' => $this->CI->config->item('base_url')."index.php/base/booking",
-                    'Снять бронь' => $this->CI->config->item('base_url')."index.php/base/bcancel"
+                    'Забронировать' => $this->CI->config->item('base_url')."index.php/booking/booking_add",
+                    'Снять бронь' => $this->CI->config->item('base_url')."index.php/booking/booking_cancel"
                 ),
 
             'Справочники' =>

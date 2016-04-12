@@ -53,6 +53,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;*/
 
+$route['booking/booking_add_form'] = 'booking/booking_add_form';
+$route['booking/booking_add'] = 'booking/booking_add';
 $route['base/hotelsadd_job'] = 'base/hotelsadd_job';
 $route['base/hotelsadd'] = 'base/hotelsadd';
 $route['base/hotelsmaintain'] = 'base/hotelsmaintain';
