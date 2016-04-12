@@ -16,20 +16,63 @@ class Base extends CI_Controller {
 
     /*
         Базовая функция контроллера.
-        Фактически сама функция ничего не делает, а просто вызывает одноименную
-        функцию из базовой библиотеки.
     */
     public function basefun() {
-        $this->baselib->basefun();
+        /*
+            Сначала проверяем залогинен ли пользователь.
+            Если залогинен, загружаем данные о пользователе из сессии, формируем
+            $data для корректного отображения форм и вызываем формы.
+        */
+        if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE) {
+            /* Сформируем штатный массив data для общих представлений. */
+            $data = $this->baselib->makedataarray();
+
+            $this->load->view('header', $data);
+            $this->load->view('mainmenu', $data);
+            $this->load->view('footer', $data);
+        /*
+            Если не залогинен, формируем данныые для формы сообщения о
+            необходимости авторизации и вызываем соответствующие формы.
+        */
+        } else {
+            $data['title'] = 'Система RentaGRAPH';
+
+            $data['rightmsg'] = "";
+            $data['righthref'] = $this->config->item('base_url')."index.php/Authoz/authz/";
+            $data['righthreftext'] = "Войти";
+
+            $this->load->view('header', $data);
+            $this->load->view('authatata', $data);
+            $this->load->view('footer', $data);
+        }
     }
 
     /*
         Контроллер отображает все дома/гостиницы [отели]
         и меню функционала по их добавлению/удалению/редактированию.
-        Собственно, вызывает одноименную функцию базовой библиотеки.
     */
     public function hotelsmaintain() {
-        $this->baselib->hotelsmaintain();
+        if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE) {
+            $data = $this->baselib->makedataarray();
+
+            $data['innermenu'] = array (
+                'Добавить' => $this->config->item('base_url')."index.php/base/hotelsadd/",
+                'Изменить' => $this->config->item('base_url')."index.php/base/hotelsedit/",
+                'Удалить' => $this->config->item('base_url')."index.php/base/hotelsdel/",
+                'Вернуть' => $this->config->item('base_url')."index.php/base/hotelsrev/"
+            );
+
+            /* Загрузим отели для отображения. */
+            $data['hotelsarray'] = $this->hotels_model->get_hotels(FALSE);
+
+            /* Зададим заголовок для страницы. */
+            $data['title'] = 'Дома/Гостиницы';
+
+            $this->load->view('header', $data);
+            $this->load->view('mainmenu', $data);
+            $this->load->view('showhotels', $data);
+            $this->load->view('footer', $data);
+        }
     }
 
     /*
@@ -40,6 +83,14 @@ class Base extends CI_Controller {
             $data = $this->baselib->makedataarray();
 
             $data['title'] = "Добавить отель";
+
+            /* Загрузим типы отелей. */
+            $htypes = $this->hotels_model->get_htypes();
+            $data['htypes'] = array();
+            /* Сформируем массив с типами отелей для представления. */
+            foreach ($htypes as $value) {
+                $data['htypes'][] = $value['htype'];
+            }
 
             $this->load->helper('form');
 
@@ -71,7 +122,32 @@ class Base extends CI_Controller {
 
             $this->hotels_model->insert_hotel($data);
 
-            $this->baselib->hotelsmaintain();
+            /* Загрузим библиотеку помощника по url-ам и вызовем функцию редиректа. */
+            $this->load->helper('url');
+            redirect('base/hotelsmaintain');
+        }
+    }
+
+    /*
+        Функция отображения/добавления/удаления типов отелей.
+    */
+    public function htypes() {
+        if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE) {
+            $data = $this->makedataarray();
+
+            $data['innermenu'] = array (
+                'Добавить' => $this->config->item('base_url')."index.php/base/htypeadd/",
+                'Удалить' => $this->config->item('base_url')."index.php/base/htypedel/",
+            );
+
+            $data['hotelsarray'] = $this->hotels_model->get_htypes();
+            /* Зададим заголовок для страницы. */
+            $data['title'] = 'Типы отелей';
+
+            $this->load->view('header', $data);
+            $this->load->view('mainmenu', $data);
+            /*$this->load->view('showhtypes', $data);*/
+            $this->load->view('footer', $data);
         }
     }
 }

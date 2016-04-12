@@ -16,7 +16,12 @@
 
             <tr>
                 <td class="label">Тип</td>
-                <td class="input"><input type="text" name="htype" value="" size="50"/></td>
+                <td class="input">
+                    <select name="htype" size="1">
+                        <?php foreach ($htypes as $value) { ?>
+                        <option value="<?php echo $value; ?>"><?php echo $value; ?></option>
+                        <?php } ?>
+                    </select>
             </tr>
 
             <tr>

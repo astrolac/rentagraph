@@ -18,37 +18,6 @@ class Baselib {
         $this->CI->load->model('Users_model');
     }
 
-    /* Базовая функция. */
-    public function basefun() {
-        /*
-            Сначала проверяем залогинен ли пользователь.
-            Если залогинен, загружаем данные о пользователе из сессии, формируем
-            $data для корректного отображения форм и вызываем формы.
-        */
-        if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE) {
-            /* Сформируем штатный массив data для общих представлений. */
-            $data = $this->makedataarray();
-
-            $this->CI->load->view('header', $data);
-            $this->CI->load->view('mainmenu', $data);
-            $this->CI->load->view('footer', $data);
-        /*
-            Если не залогинен, формируем данныые для формы сообщения о
-            необходимости авторизации и вызываем соответствующие формы.
-        */
-        } else {
-            $data['title'] = 'basefun';
-
-            $data['rightmsg'] = "";
-            $data['righthref'] = $this->CI->config->item('base_url')."index.php/Authoz/authz/";
-            $data['righthreftext'] = "Войти";
-
-            $this->CI->load->view('header', $data);
-            $this->CI->load->view('authatata', $data);
-            $this->CI->load->view('footer', $data);
-        }
-    }
-
     /*
         Функция формирования массива для построения меню пользователя (согласно
         роли).
@@ -58,13 +27,21 @@ class Baselib {
     */
     public function makeMenuArray($roleid) {
         $menuArray = array (
+            'Бронирование' =>
+                array (
+                    'Забронировать' => $this->CI->config->item('base_url')."index.php/base/booking",
+                    'Снять бронь' => $this->CI->config->item('base_url')."index.php/base/bcancel"
+                ),
+
             'Справочники' =>
                 array (
                     'Дома/гостиницы' => $this->CI->config->item('base_url')."index.php/base/hotelsmaintain",
+                    'Типы' => $this->CI->config->item('base_url')."index.php/base/htypes",
                     'Пользователи' => $this->CI->config->item('base_url')."index.php/base/usersmaintain",
                     'Роли' => $this->CI->config->item('base_url')."index.php/base/rolesmaintain"
                 ),
-            'Справка' => $this->CI->config->item('base_url')."index.php/base/helpium.php"
+
+            'Справка' => $this->CI->config->item('base_url')."index.php/base/helpium"
         );
         return $menuArray;
     }
@@ -86,31 +63,4 @@ class Baselib {
 
         return $data;
     }
-
-    /*
-        Функция отображает все дома/гостиницы [отели]
-        и меню функционала по их добавлению/удалению/редактированию.
-    */
-    public function hotelsmaintain() {
-        if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE) {
-            $data = $this->makedataarray();
-
-            $data['innermenu'] = array (
-                'Добавить' => $this->CI->config->item('base_url')."index.php/base/hotelsadd/",
-                'Изменить' => $this->CI->config->item('base_url')."index.php/base/hotelsedit/",
-                'Удалить' => $this->CI->config->item('base_url')."index.php/base/hotelsdel/",
-                'Вернуть' => $this->CI->config->item('base_url')."index.php/base/hotelsrev/"
-            );
-
-            /* Загрузим отели для отображения. */
-            $data['hotelsarray'] = $this->CI->hotels_model->get_hotels(FALSE);
-            /* Зададим заголовок для страницы. */
-            $data['title'] = 'Дома/Гостиницы';
-
-            $this->CI->load->view('header', $data);
-            $this->CI->load->view('mainmenu', $data);
-            $this->CI->load->view('showhotels', $data);
-            $this->CI->load->view('footer', $data);
-        }
-  }
 }

@@ -20,11 +20,18 @@ class Hotels_model extends CI_Model {
             return $query->result_array();
         }
 
-        $query = $this->db->get_where('hotels', array('uid' => $hotelid, 'isactive' => 0));
+        $query = $this->db->get_where('hotels', array('uid' => $hotelid, 'isactive' => 1));
         return $query->row_array();
     }
 
     public function insert_hotel($data) {
         return $this->db->insert('hotels', $data);
     }
+
+    public function get_htypes()
+    {
+        $query = $this->db->get('htypes');
+        return $query->result_array();
+    }
+
 }

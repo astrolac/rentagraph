@@ -52,7 +52,8 @@ class Authoz extends CI_Controller {
             unset($_SESSION['roleid']);
             $_SESSION['logon'] = FALSE;
             $this->session->sess_destroy();
-            $this->baselib->basefun();
+            $this->load->helper('url');
+            redirect('base/basefun');
         }
     }
 
@@ -64,6 +65,7 @@ class Authoz extends CI_Controller {
     */
     public function auth_test() {
       if(!isset($_SESSION['logon']) || $_SESSION['logon'] == FALSE) {
+        $this->load->helper('url');
         /* Сформируме массив с переданными данными о имени пользователя и пароле. */
         $data = array(
             'login' => $this->input->post('login'),
@@ -78,9 +80,9 @@ class Authoz extends CI_Controller {
             $_SESSION['logon'] = TRUE;
             $_SESSION['username'] = $userdb['username'];
             $_SESSION['roleid'] = $userdb['roleid'];
-            $this->baselib->basefun();
+            redirect('base/basefun');
         } else {
-            $this->authz();
+            redirect('authoz/authz');
         }
       }
     }
