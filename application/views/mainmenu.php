@@ -5,14 +5,12 @@
         <?php
         function echoarr ($inarr) {
             echo "<ul>";
-            foreach ($inarr as $key => $value) {
-                if (is_array($value)) {
-                    echo "<li><a href=\"#\">".$key."</a>";
-                    echoarr($value);
-                    echo "</li>";
-                } else {
-                    echo "<li><a href=\"".$value."\">".$key."</a></li>";
+            foreach ($inarr as $menuitem) {
+                echo "<li><a href=\"".$menuitem['href']."\">".$menuitem['title']."</a>";
+                if (is_array($menuitem['subm'])) {
+                    echoarr($menuitem['subm']);
                 }
+                echo "</li>";
             }
             echo "</ul>";
         }
@@ -26,14 +24,12 @@
             Можно было бы обойтись и просто самой функцией, без этого цикла, но
             у главного списка есть id, а у вложенных его нет.
         */
-        foreach ($mainmenuarray as $menuname => $menuhref) {
-            if (is_array($menuhref)) {
-                echo "<li><a href=\"#\">".$menuname."</a>";
-                echoarr($menuhref);
-                echo "</li>";
-            } else {
-                echo "<li><a href=\"".$menuhref."\">".$menuname."</a></li>";
+        foreach ($mainmenuarray as $menuitem) {
+            echo "<li><a href=\"".$menuitem['href']."\">".$menuitem['title']."</a>";
+            if (is_array($menuitem['subm'])) {
+                echoarr($menuitem['subm']);
             }
+            echo "</li>";
         }
         ?>
 

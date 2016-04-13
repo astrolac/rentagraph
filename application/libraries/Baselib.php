@@ -21,28 +21,61 @@ class Baselib {
     /*
         Функция формирования массива для построения меню пользователя (согласно
         роли).
-        Возвращаемый массив содержит пункты меню в штатном формате $key => $value
-        где $key - имя пункта меню, $ value - ссылка на страницу-обработчик.
-        Если пункт меню содержит подпункты, то $value - массив подпунктов и т.д.
+        Возвращаемый массив содержит пункты меню. Каждый пункт меню - массив.
+        Массивы могут быть вложенными, если являются пунктами подменю.
+        Вложенность не ограничена.
     */
     public function makeMenuArray($roleid) {
         $menuArray = array (
-            'Бронирование' =>
-                array (
-                    'Забронировать' => $this->CI->config->item('base_url')."index.php/booking/booking_add",
-                    'Снять бронь' => $this->CI->config->item('base_url')."index.php/booking/booking_cancel"
-                ),
-
-            'Справочники' =>
-                array (
-                    'Дома/гостиницы' => $this->CI->config->item('base_url')."index.php/base/hotelsmaintain",
-                    'Типы' => $this->CI->config->item('base_url')."index.php/base/htypes",
-                    'Пользователи' => $this->CI->config->item('base_url')."index.php/base/usersmaintain",
-                    'Роли' => $this->CI->config->item('base_url')."index.php/base/rolesmaintain"
-                ),
-
-            'Справка' => $this->CI->config->item('base_url')."index.php/base/helpium"
+            array(
+                'title' =>  'Бронирование',
+                'href'  =>  $this->CI->config->item('base_url')."index.php/booking/bookings",
+                'subm'  =>  array (
+                              array (
+                                'title' =>  'Забронировать',
+                                'href'  =>  $this->CI->config->item('base_url')."index.php/booking/booking_add",
+                                'subm'  =>  ''
+                              ),
+                              array (
+                                'title' =>  'Снять бронь',
+                                'href'  =>  $this->CI->config->item('base_url')."index.php/booking/booking_cancel",
+                                'subm'  =>  ''
+                              )
+                            )
+            ),
+            array(
+                'title' =>  'Справочники',
+                'href'  =>  '#',
+                'subm'  =>  array (
+                              array (
+                                'title' =>  'Отели',
+                                'href'  =>  $this->CI->config->item('base_url')."index.php/base/hotelsmaintain",
+                                'subm'  =>  ''
+                              ),
+                              array (
+                                'title' =>  'Типы отелей',
+                                'href'  =>  $this->CI->config->item('base_url')."index.php/base/htypes",
+                                'subm'  =>  ''
+                              ),
+                              array (
+                                'title' =>  'Пользователи',
+                                'href'  =>  $this->CI->config->item('base_url')."index.php/authoz/usersmaintain",
+                                'subm'  =>  ''
+                              ),
+                              array (
+                                'title' =>  'Роли',
+                                'href'  =>  $this->CI->config->item('base_url')."index.php/authoz/rolesmaintain",
+                                'subm'  =>  ''
+                              )
+                            )
+            ),
+            array(
+                'title' =>  'Справка',
+                'href'  =>  $this->CI->config->item('base_url')."index.php/base/helpium",
+                'subm'  =>  ''
+            )
         );
+
         return $menuArray;
     }
 

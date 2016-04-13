@@ -102,7 +102,7 @@ class Base extends CI_Controller {
     }
 
     /*
-        Функия обрабатывает данные от формы добавления отеля.
+        Функия обрабатывает данные от формы добавления отеля и добавляет отель в БД.
     */
     public function hotelsadd_job() {
         if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE) {

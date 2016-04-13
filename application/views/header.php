@@ -11,7 +11,6 @@
                   <?php /*echo $title;*/ ?>
               </div>
               <div class="info">
-                <?php echo $rightmsg; ?>
-                <a href="<?php echo $righthref; ?>"><?php echo $righthreftext; ?></a>
+                <?php echo $rightmsg; ?> <a href="<?php echo $righthref; ?>"><?php echo $righthreftext; ?></a>
               </div>
         </div>
