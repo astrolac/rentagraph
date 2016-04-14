@@ -11,38 +11,71 @@
 
         <tr>
             <td class="label">Дата заезда</td>
-            <td class="input"><input type="text" name="datein" class="tcal icalInput" value="" /></td>
+            <td class="input"><input  type="text"
+                                      name="datein"
+                                      class="tcal icalInput"
+                                      value="<?php if(isset($forminfo)) { echo $forminfo['datein']; } ?>" />
+            </td>
 
             <td class="label">Дата выезда</td>
-            <td class="input"><input type="text" name="dateout" class="tcal icalInput" value="" /></td>
+            <td class="input">
+                <input  type="text"
+                        name="dateout"
+                        class="tcal icalInput"
+                        value="<?php if(isset($forminfo)) { echo $forminfo['dateout']; } ?>" />
+            </td>
         </tr>
 
         <tr>
             <td class="label">Контактное лицо (гость)</td>
-            <td class="input" colspan="3"><textarea name="person" maxlength="1024" rows="5" cols="80"></textarea></td>
+            <td class="input" colspan="3">
+                <textarea name="person" maxlength="1024" rows="5" cols="80"><?php if(isset($forminfo)) { echo $forminfo['person']; } ?></textarea>
+            </td>
         </tr>
 
         <tr>
             <td class="label">Телефон</td>
-            <td class="input" colspan="3"><input type="text" name="personphone" value="" size="50"/></td>
+            <td class="input" colspan="3">
+                <input  type="text"
+                        name="personphone"
+                        size="50"
+                        value="<?php if(isset($forminfo)) { echo $forminfo['personphone']; } ?>" />
+            </td>
         </tr>
 
         <tr>
             <td class="label">Общая сумма проживания</td>
-            <td class="input" colspan="3"><input type="text" name="totalsum" value="" size="20"/></td>
+            <td class="input" colspan="3">
+                <input  type="text"
+                        name="totalsum"
+                        size="20"
+                        value="<?php if(isset($forminfo)) { echo $forminfo['totalsum']; } ?>" />
+            </td>
         </tr>
 
         <tr>
             <td class="label">Сумма предоплаты</td>
-            <td class="input"><input type="text" name="beforepaysum" value="" size="20"/></td>
+            <td class="input">
+                <input  type="text"
+                        name="beforepaysum"
+                        size="20"
+                        value="<?php if(isset($forminfo)) { echo $forminfo['beforepaysum']; } ?>" />
+            </td>
 
             <td class="label">Дата внесения предоплаты</td>
-            <td class="input"><input type="text" name="beforepaydate" class="tcal icalInput" value="" /></td>
+            <td class="input">
+                <input  type="text"
+                        name="beforepaydate"
+                        class="tcal icalInput"
+                        value="<?php if(isset($forminfo)) { echo $forminfo['beforepaydate']; } ?>" />
+            </td>
         </tr>
 
         <tr>
             <td class="label">Комментарии</td>
-            <td class="input" colspan="3"><textarea name="comments" maxlength="4096" rows="5" cols="80"></textarea></td>
+            <td class="input" colspan="3">
+                <textarea name="comments" maxlength="4096" rows="5" cols="80"><?php if(isset($forminfo)) { echo $forminfo['comments']; } ?></textarea>
+            </td>
         </tr>
 
         <tr>

@@ -56,6 +56,24 @@
   vertical-align: middle;
   text-align: center;
 }
+
+/*
+    Стили для ошибок
+*/
+#errortext {
+    font-family: Calibri, Helvetica, Verdana, Arial;
+    font-weight: bold;
+    font-size: 12pt;
+    color: red;
+    padding: 5px 0;
+    margin: 0;
+    background: white;
+    width: 100%;
+    overflow: auto;
+    vertical-align: middle;
+    text-align: center;
+}
+
 /*
     Стили для таблицы с отелями
 */

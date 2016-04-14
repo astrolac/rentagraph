@@ -1,5 +1,7 @@
 <?php
-    $megatron = 'megatron';
+    $data = array(1 => 1, 2 => 2);
+    echo count($data);
+/*    $megatron = 'megatron';
     $testarr = array (
       'one' => 'vone',
       'two' => 'vtwo',
@@ -23,3 +25,4 @@
     echo "\n";
     echoarr($testarr, 0);
     echo "\n";
+*/

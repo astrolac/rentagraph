@@ -156,7 +156,7 @@ class Base extends CI_Controller {
     */
     public function showerror() {
         if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE) {
-            $data = $this->makedataarray();
+            /*$data = $this->makedataarray();
             switch ($_SESSION['errorinfo']['etype']) {
                 case 1:   $data['etitle'] = 'Текущая бронь перекрывается с уже существующей!';
                           $data['nextstephref'] = 'booking/booking_add_form/'.$_SESSION['errorinfo']['forminfo']['huid'];
@@ -173,7 +173,7 @@ class Base extends CI_Controller {
             $this->load->view('header', $data);
             $this->load->view('mainmenu', $data);
             $this->load->view('show_error', $data);
-            $this->load->view('footer', $data);
+            $this->load->view('footer', $data);*/
         }
     }
 }

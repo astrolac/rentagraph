@@ -75,12 +75,28 @@ class Booking extends CI_Controller {
             $data['title'] = "Добавить бронь для \"".$hotel['hname']."\"";
           /*  В этой переменной передадим uid отеля. */
             $data['huid'] = $huid;
+
+            if(isset($_SESSION['errorinfo'])) {
+                $data['errortext'] = $_SESSION['errorinfo']['etext'];
+                $data['forminfo'] = $_SESSION['errorinfo']['forminfo'];
+                $data['addinfo'] = $_SESSION['errorinfo']['blob'];
+                unset($_SESSION['errorinfo']);
+            }
           /*  Загрузим хелпер форм. */
             $this->load->helper('form');
           /*  Отобразим необходимые представления. */
             $this->load->view('header', $data);
             $this->load->view('mainmenu', $data);
+          /*  Если есть текст ошибки - отобразим его. */
+            if(isset($data['errortext'])) {
+                $this->load->view('show_error', $data);
+            }
+          /*  Далее отобразим саму форму. */
             $this->load->view('booking_add_form', $data);
+          /*  И если нужно еще какую-нибудь лажу отобразить ее также выдаем. */
+            if(isset($data['addinfo'])) {
+                $this->load->view('show_addinfo', $data);
+            }
             $this->load->view('footer', $data);
         }
     }
@@ -111,13 +127,14 @@ class Booking extends CI_Controller {
                                                       $bookinginfo['dateout']);
           /*  Загрузим хелпер урлов для будущих редиректов. */
             $this->load->helper('url');
-            if (empty($res)) {
+            if (count($res) == 0) {
               /*  Если никаких броней пересекающейся с нашей нет, то добавим данные в БД. */
                 $this->hotels_model->insert_booking($bookinginfo);
-              /*  Редирект на страницу бронирования. */
+              /*  Редирект на общую страницу бронирования. */
                 redirect('booking/bookings');
             } else {
-              /*  Если что-то все же обнаружим, то выведем форму с ошибкой.
+              /*  Если что-то все же обнаружим, то сделаем редирект на страницу
+                  формы добавления брони, но с уведомлением об ошибке.
                   Для этого сформируем данные для сообщения об ошибке. */
 
               /*  Сначала подготовим массив для формы. Чтобы при повторном
@@ -126,18 +143,17 @@ class Booking extends CI_Controller {
                 unset($bookinginfo['isactive']);
                 $bookinginfo['datein'] = $this->input->post('datein');
                 $bookinginfo['dateout'] = $this->input->post('dateout');
+                $bookinginfo['beforepaydate'] = $this->input->post('beforepaydate');
               /*  Теперь сформируем сам массив для отображения ошибки. */
                 $errorinfo = array (
-                    'etype' => 1,
+                    'etext' => 'Новая бронь пересекается с одной из существующих!',
                     'forminfo' => $bookinginfo,
                     'blob' => $res
                 );
               /*  Запомним эти данные в сессии. */
                 $_SESSION['errorinfo'] = $errorinfo;
-              /*  Отметим этот элемент как flashdata. */
-                //$this->session->mark_as_flash('errorinfo');
-              /*  И сделаем редирект на контроллер обработки сообщений об ошибках. */
-                redirect('base/showerror');
+              /*  И сделаем редирект. */
+                redirect('booking/booking_add_form/'.$bookinginfo['huid']);
             }
         }
     }
