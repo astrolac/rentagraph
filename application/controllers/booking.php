@@ -15,6 +15,30 @@ class Booking extends CI_Controller {
     }
 
     /*
+         Функция отображения броней всех отелей в табличном виде
+         с цветовой дифференциацией штанов.
+    */
+    public function bookings($datestart = FALSE, $dateend = FALSE) {
+        if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE) {
+          /*  Загрузим универсальные данные. */
+            $data = $this->baselib->makedataarray();
+          /*  Сформируем массив с внутренним меню представления. */
+            $data['innermenu'] = array (
+                'Добавить' => $this->config->item('base_url')."index.php/booking/booking_add/",
+                'Отменить' => $this->config->item('base_url')."index.php/booking/booking_cancel/"
+            );
+          /*  Сформируем заголовок для пользователя. */
+            $data['title'] = "Все брони";
+
+          /*  Отобразим необходимые представления. */
+            $this->load->view('header', $data);
+            $this->load->view('mainmenu', $data);
+            $this->load->view('bookings_show', $data);
+            $this->load->view('footer', $data);
+        }
+    }
+
+    /*
          Функция добавления брони.
     */
     public function booking_add() {
@@ -23,10 +47,7 @@ class Booking extends CI_Controller {
             $data = $this->baselib->makedataarray();
           /*  Сформируем массив с внутренним меню представления. */
             $data['innermenu'] = array (
-                /*'Добавить' => $this->config->item('base_url')."index.php/base/hotelsadd/",
-                'Изменить' => $this->config->item('base_url')."index.php/base/hotelsedit/",
-                'Удалить' => $this->config->item('base_url')."index.php/base/hotelsdel/",
-                'Вернуть' => $this->config->item('base_url')."index.php/base/hotelsrev/"*/
+                'Отмена' => $this->config->item('base_url')."index.php/booking/bookings/",
             );
           /*  Загрузим отели для отображения. */
             $data['hotelsarray'] = $this->hotels_model->get_hotels(FALSE);
@@ -83,12 +104,41 @@ class Booking extends CI_Controller {
                 'userlogin' => $_SESSION['login'],
                 'isactive' => 1
             );
-          /*  Сейчас будем проверять не перекрывает ли новая бронь уже существующие. */
+          /*  Сейчас будем проверять не перекрывает ли новая бронь уже существующие.
+              Сначала получим все брони которые пересекаются с введенной. */
+            $res = $this->hotels_model->get_bookings( $bookinginfo['huid'],
+                                                      $bookinginfo['datein'],
+                                                      $bookinginfo['dateout']);
+          /*  Загрузим хелпер урлов для будущих редиректов. */
+            $this->load->helper('url');
+            if (empty($res)) {
+              /*  Если никаких броней пересекающейся с нашей нет, то добавим данные в БД. */
+                $this->hotels_model->insert_booking($bookinginfo);
+              /*  Редирект на страницу бронирования. */
+                redirect('booking/bookings');
+            } else {
+              /*  Если что-то все же обнаружим, то выведем форму с ошибкой.
+                  Для этого сформируем данные для сообщения об ошибке. */
 
-          /*  Добавим данные в БД. */
-            $this->hotels_model->insert_booking($bookinginfo);
-          /*  Редирект на страницу бронирования. */
-            redirect('booking/bookings');
+              /*  Сначала подготовим массив для формы. Чтобы при повторном
+                  отображении формы введенные данные были сохранены. */
+                unset($bookinginfo['userlogin']);
+                unset($bookinginfo['isactive']);
+                $bookinginfo['datein'] = $this->input->post('datein');
+                $bookinginfo['dateout'] = $this->input->post('dateout');
+              /*  Теперь сформируем сам массив для отображения ошибки. */
+                $errorinfo = array (
+                    'etype' => 1,
+                    'forminfo' => $bookinginfo,
+                    'blob' => $res
+                );
+              /*  Запомним эти данные в сессии. */
+                $_SESSION['errorinfo'] = $errorinfo;
+              /*  Отметим этот элемент как flashdata. */
+                //$this->session->mark_as_flash('errorinfo');
+              /*  И сделаем редирект на контроллер обработки сообщений об ошибках. */
+                redirect('base/showerror');
+            }
         }
     }
 

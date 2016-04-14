@@ -150,4 +150,30 @@ class Base extends CI_Controller {
             $this->load->view('footer', $data);
         }
     }
+
+    /*
+        Функция отображения сообщений об ошибках.
+    */
+    public function showerror() {
+        if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE) {
+            $data = $this->makedataarray();
+            switch ($_SESSION['errorinfo']['etype']) {
+                case 1:   $data['etitle'] = 'Текущая бронь перекрывается с уже существующей!';
+                          $data['nextstephref'] = 'booking/booking_add_form/'.$_SESSION['errorinfo']['forminfo']['huid'];
+                          'nextsteptext' => 'Попробуйте выбрать другой период.',
+                          break;
+            }
+
+            $data['etitle'] = $_SESSION['errorinfo']['etitle'];
+            $data['nextstephref'] = $_SESSION['errorinfo']['nextstephref'];
+            $data['nextsteptext'] = $_SESSION['errorinfo']['nextstephref'];
+
+
+
+            $this->load->view('header', $data);
+            $this->load->view('mainmenu', $data);
+            $this->load->view('show_error', $data);
+            $this->load->view('footer', $data);
+        }
+    }
 }

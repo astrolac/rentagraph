@@ -41,15 +41,24 @@ class Hotels_model extends CI_Model {
     }
 
     /*
-        Функция получения всех броней отеля за заданный период.
-        Если период не задан, то выдает все брони отеля.
+        Функция получения всех ативных броней отеля за заданный период.
+        Если период не задан, то выдает все активные брони отеля.
         Если задано только начало или конец периода, выдает с
         соответствующими ограничениями.
         Попадание в заданный период определяется на основе пересечения
         периодов.
+        Диапазон дат ограничен 01-01-1900 и 31-12-2100, думаю хватит ... или нет ... ?
     */
-    public function get_bookings($huid, $datestart == FALSE, $dateend == FALSE) {
-        ;
+    public function get_bookings($huid, $datein = FALSE, $dateout = FALSE) {
+        $querystr = "SELECT * from bookings WHERE huid=".$huid." AND isactive=1";
+        if ($datein) {
+            $querystr .=" AND (dateout BETWEEN '".$datein."' AND '2100-12-31')";
+        }
+        if ($dateout) {
+            $querystr .=" AND (datein BETWEEN '1900-01-01' AND '".$dateout."')";
+        }
+        $querystr .=";";
+        $query = $this->db->query($querystr);
     }
 
     /*
