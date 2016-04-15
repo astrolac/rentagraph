@@ -58,7 +58,7 @@ class Hotels_model extends CI_Model {
             $querystr .=" AND (datein BETWEEN '1900-01-01' AND '".$dateout."')";
         }
         $querystr .=";";
-        $query = $this->db->query($querystr);
+        return $this->db->query($querystr);
     }
 
     /*

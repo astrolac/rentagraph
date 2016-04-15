@@ -120,13 +120,13 @@ class Booking extends CI_Controller {
                 'userlogin' => $_SESSION['login'],
                 'isactive' => 1
             );
+          /*  Загрузим хелпер урлов для будущих редиректов. */
+            $this->load->helper('url');
           /*  Сейчас будем проверять не перекрывает ли новая бронь уже существующие.
               Сначала получим все брони которые пересекаются с введенной. */
             $res = $this->hotels_model->get_bookings( $bookinginfo['huid'],
                                                       $bookinginfo['datein'],
                                                       $bookinginfo['dateout']);
-          /*  Загрузим хелпер урлов для будущих редиректов. */
-            $this->load->helper('url');
             if (count($res) == 0) {
               /*  Если никаких броней пересекающейся с нашей нет, то добавим данные в БД. */
                 $this->hotels_model->insert_booking($bookinginfo);
