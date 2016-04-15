@@ -13,3 +13,6 @@ function get_bookings($huid, $datein = FALSE, $dateout = FALSE) {
 }
 
 get_bookings(1,'2016-05-01','2016-05-01');
+
+echo "\n".floatval(str_replace(",",".","10.5"))."\n";
+echo "\n".floatval(str_replace(",",".","10,5"))."\n";

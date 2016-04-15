@@ -114,9 +114,9 @@ class Base extends CI_Controller {
                 'personphone' => $this->input->post('personphone'),
                 'haddress' => $this->input->post('address'),
                 'hcomments' => $this->input->post('comments'),
-                'percentfee' => floatval($this->input->post('percentfee')),
-                'fixedfee' => floatval($this->input->post('fixedfee')),
-                'price' => floatval($this->input->post('price')),
+                'percentfee' => floatval(str_replace(",",".",$this->input->post('percentfee'))),
+                'fixedfee' => floatval(str_replace(",",".",$this->input->post('fixedfee'))),
+                'price' => floatval(str_replace(",",".",$this->input->post('price'))),
                 'isactive' => 1
             );
 

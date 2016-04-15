@@ -95,8 +95,26 @@ class Booking extends CI_Controller {
             $this->load->view('booking_add_form', $data);
           /*  И если нужно еще какую-нибудь лажу отобразить ее также выдаем. */
             if(isset($data['addinfo'])) {
+              /*  В случае если лажа передана, сформируем для нее заголовок
+                  и добавим его в массив с лажей.
+                  Важно отметить что лажа это всегда какая-либо таблица. */
+                array_unshift($data['addinfo'],
+                                array(
+                                  'Номер брони',
+                                  'Дата заезда',
+                                  'Дата выезда',
+                                  'Гость',
+                                  'Номер телефона',
+                                  'Стоимость проживания',
+                                  'Сумма предоплаты',
+                                  'Дата внесения предоплаты',
+                                  'Комментарии'
+                                )
+                              );
+              /*  Теперь отобразим лажу. */
                 $this->load->view('show_addinfo', $data);
             }
+          /*  Ну и футер как обычно. */
             $this->load->view('footer', $data);
         }
     }
@@ -113,8 +131,8 @@ class Booking extends CI_Controller {
                 'dateout' => $this->dateconvert($this->input->post('dateout')),
                 'person' => $this->input->post('person'),
                 'personphone' => $this->input->post('personphone'),
-                'totalsum' => floatval($this->input->post('totalsum')),
-                'beforepaysum' => floatval($this->input->post('beforepaysum')),
+                'totalsum' => floatval(str_replace(",",".",$this->input->post('totalsum'))),
+                'beforepaysum' => floatval(str_replace(",",".",$this->input->post('beforepaysum'))),
                 'beforepaydate' => $this->dateconvert($this->input->post('beforepaydate')),
                 'comments' => $this->input->post('comments'),
                 'userlogin' => $_SESSION['login'],
@@ -148,7 +166,7 @@ class Booking extends CI_Controller {
                 $errorinfo = array (
                     'etext' => 'Новая бронь пересекается с одной из существующих!',
                     'forminfo' => $bookinginfo,
-                    'blob' => $res
+                    'blob' => $res,
                 );
               /*  Запомним эти данные в сессии. */
                 $_SESSION['errorinfo'] = $errorinfo;

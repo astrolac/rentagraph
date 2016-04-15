@@ -18,12 +18,14 @@
 </div>
 <div id="hotels">
     <table class="hotels">
-      <tbody>
-          <tr class="theader">
+      <thead>
+          <tr>
               <td class="theader">UID</td>
               <td class="theader">Наименование</td>
               <td class="theader">Текущие брони</td>
           </tr>
+      </thead>
+      <tbody>
           <?php
               foreach ($hotelsarray as $row) {
                   echo "<tr>";

@@ -74,6 +74,18 @@
     text-align: center;
 }
 
+#addinfo {
+  font-family: Calibri, Helvetica, Verdana, Arial;
+  font-size: 10pt;
+  color: red;
+  padding: 5px 0;
+  margin: 0;
+  background: white;
+  width: 80%;
+  overflow: auto;
+  vertical-align: middle;
+  text-align: center;
+}
 /*
     Стили для таблицы с отелями
 */
@@ -85,7 +97,7 @@ table.hotels {
   width: 95%;
 }
 
-td.theader {
+thead {
   text-align: center;
   font-weight: bold;
   border: 1px solid black;

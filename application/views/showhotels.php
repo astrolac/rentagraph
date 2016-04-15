@@ -8,20 +8,21 @@
 </div>
 <div id="hotels">
     <table class="hotels">
-      <tbody>
-          <tr class="theader">
-              <td class="theader">UID</td>
-              <td class="theader">Наименование</td>
-              <td class="theader">Тип</td>
-              <td class="theader">Контактное лицо</td>
-              <td class="theader">Телефон</td>
-              <td class="theader">Адрес</td>
-              <td class="theader">Комментарии</td>
-              <td class="theader">Комиссия в %</td>
-              <td class="theader">Фиксированная комиссия</td>
-              <td class="theader">Цена за сутки</td>
+        <thead>
+          <tr>
+              <td>UID</td>
+              <td>Наименование</td>
+              <td>Тип</td>
+              <td>Контактное лицо</td>
+              <td>Телефон</td>
+              <td>Адрес</td>
+              <td>Комментарии</td>
+              <td>Комиссия в %</td>
+              <td>Фиксированная комиссия</td>
+              <td>Цена за сутки</td>
           </tr>
-          <?php
+        </thead>
+        <tbody><?php
               foreach ($hotelsarray as $row) {
                   echo "<tr>";
                       echo "<td class=\"numeric\">".$row['uid']."</td>";
@@ -37,6 +38,6 @@
                   echo "</tr>";
               }
           ?>
-      </tbody>
+        </tbody>
     </table>
 </div>
