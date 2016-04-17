@@ -133,7 +133,7 @@ class Base extends CI_Controller {
     */
     public function htypes() {
         if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE) {
-            $data = $this->makedataarray();
+            $data = $this->baselib->makedataarray();
 
             $data['innermenu'] = array (
                 'Добавить' => $this->config->item('base_url')."index.php/base/htypeadd/",

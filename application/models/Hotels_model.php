@@ -52,12 +52,12 @@ class Hotels_model extends CI_Model {
     public function get_bookings($huid, $datein = FALSE, $dateout = FALSE) {
         $querystr = "SELECT uid,datein,dateout,person,personphone,totalsum,beforepaysum,beforepaydate,comments from bookings WHERE huid=".$huid." AND isactive=1";
         if ($datein) {
-            $querystr .=" AND (dateout BETWEEN '".$datein."' AND '2100-12-31')";
+            $querystr .=" AND dateout>'".$datein."'";
         }
         if ($dateout) {
-            $querystr .=" AND (datein BETWEEN '1900-01-01' AND '".$dateout."')";
+            $querystr .=" AND datein<'".$dateout."'";
         }
-        $querystr .=";";
+        $querystr .=" ORDER BY datein;";
         $query = $this->db->query($querystr);
         return $query->result_array();
     }
@@ -67,6 +67,19 @@ class Hotels_model extends CI_Model {
     */
     public function insert_booking($data) {
         return $this->db->insert('bookings', $data);
+    }
+
+    public function test_get_bookings($huid, $datein = FALSE, $dateout = FALSE) {
+        $querystr = "SELECT uid,datein,dateout,person,personphone,totalsum,beforepaysum,beforepaydate,comments from bookings WHERE huid=".$huid." AND isactive=1";
+        if ($datein) {
+            $querystr .=" AND dateout>'".$datein."'";
+        }
+        if ($dateout) {
+            $querystr .=" AND datein<'".$dateout."'";
+        }
+        $querystr .=" ORDER BY datein;";
+
+        return $querystr;
     }
 
 }

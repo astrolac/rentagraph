@@ -6,3 +6,6 @@
     }
     ?>
 </div>
+<div id="bookings">
+
+</div>

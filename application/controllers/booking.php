@@ -30,6 +30,12 @@ class Booking extends CI_Controller {
           /*  Сформируем заголовок для пользователя. */
             $data['title'] = "Все брони";
 
+            $allhotels = $this->hotel_model->get_hotels();
+
+            foreach($allhotels as $hotelitem) {
+                $allbookings[$hotelitem['huid']] = $this->hotel_model->get_bookings($hotelitem['huid']);
+            }
+
           /*  Отобразим необходимые представления. */
             $this->load->view('header', $data);
             $this->load->view('mainmenu', $data);
@@ -181,5 +187,16 @@ class Booking extends CI_Controller {
     */
     private function dateconvert($instr) {
         return substr($instr, -4)."-".substr($instr, 3, 2)."-".substr($instr, 0, 2);
+    }
+
+    public function testv() {
+        if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE) {
+            $data = $this->baselib->makedataarray();
+              $data['str'] = $this->hotels_model->test_get_bookings(4,'2016-03-30','2016-04-25');
+            $this->load->view('header', $data);
+            $this->load->view('mainmenu', $data);
+              $this->load->view('testv', $data);
+            $this->load->view('footer', $data);
+        }
     }
 }
