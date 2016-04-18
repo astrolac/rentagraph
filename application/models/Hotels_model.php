@@ -82,4 +82,21 @@ class Hotels_model extends CI_Model {
         return $querystr;
     }
 
+    /*
+        Функция возвращает максимальный период всех активных броней.
+    */
+    public function get_active_bookings_period() {
+        $querystr = "SELECT MIN(datein) AS periodstart FROM bookings WHERE isactive=1;";
+        $query = $this->db->query($querystr);
+        $res = $query->result_array();
+        $periodstart = $res[0]['periodstart'];
+
+        $querystr = "SELECT MAX(dateout) AS periodend FROM bookings WHERE isactive=1;";
+        $query = $this->db->query($querystr);
+        $res = $query->result_array();
+        $periodend = $res[0]['periodend'];
+
+        return array($periodstart, $periodend);
+    }
+
 }
