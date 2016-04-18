@@ -79,6 +79,14 @@
         </tr>
 
         <tr>
+            <td class="label" colspan="4">Бронь владельца
+              <input  type="checkbox"
+                      name="byowner"
+                      <?php if(isset($forminfo)) { if($forminfo['byowner'] == 'on') {echo "checked";} } ?> />
+            </td>
+        </tr>
+
+        <tr>
             <td colspan="4" class="button"><input type="submit" name="submit" value="Добавить" /></td>
         </tr>
       </tbody>

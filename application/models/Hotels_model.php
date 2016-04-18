@@ -50,7 +50,7 @@ class Hotels_model extends CI_Model {
         Диапазон дат ограничен 01-01-1900 и 31-12-2100, думаю хватит ... или нет ... ?
     */
     public function get_bookings($huid, $datein = FALSE, $dateout = FALSE) {
-        $querystr = "SELECT uid,datein,dateout,person,personphone,totalsum,beforepaysum,beforepaydate,comments from bookings WHERE huid=".$huid." AND isactive=1";
+        $querystr = "SELECT uid,datein,dateout,person,personphone,totalsum,beforepaysum,beforepaydate,comments,byowner from bookings WHERE huid=".$huid." AND isactive=1";
         if ($datein) {
             $querystr .=" AND dateout>'".$datein."'";
         }
@@ -70,7 +70,7 @@ class Hotels_model extends CI_Model {
     }
 
     public function test_get_bookings($huid, $datein = FALSE, $dateout = FALSE) {
-        $querystr = "SELECT uid,datein,dateout,person,personphone,totalsum,beforepaysum,beforepaydate,comments from bookings WHERE huid=".$huid." AND isactive=1";
+        $querystr = "SELECT uid,datein,dateout,person,personphone,totalsum,beforepaysum,beforepaydate,comments,byowner from bookings WHERE huid=".$huid." AND isactive=1";
         if ($datein) {
             $querystr .=" AND dateout>'".$datein."'";
         }

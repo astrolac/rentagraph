@@ -30,10 +30,10 @@ class Booking extends CI_Controller {
           /*  Сформируем заголовок для пользователя. */
             $data['title'] = "Все брони";
 
-            $allhotels = $this->hotel_model->get_hotels();
+            $allhotels = $this->hotels_model->get_hotels();
 
             foreach($allhotels as $hotelitem) {
-                $allbookings[$hotelitem['huid']] = $this->hotel_model->get_bookings($hotelitem['huid']);
+                $allbookings[$hotelitem['uid']] = $this->hotels_model->get_bookings($hotelitem['uid']);
             }
 
           /*  Отобразим необходимые представления. */
@@ -114,7 +114,8 @@ class Booking extends CI_Controller {
                                   'Стоимость проживания',
                                   'Сумма предоплаты',
                                   'Дата внесения предоплаты',
-                                  'Комментарии'
+                                  'Комментарии',
+                                  'Бронь владельца'
                                 )
                               );
               /*  Теперь отобразим лажу. */
@@ -142,6 +143,7 @@ class Booking extends CI_Controller {
                 'beforepaydate' => $this->dateconvert($this->input->post('beforepaydate')),
                 'comments' => $this->input->post('comments'),
                 'userlogin' => $_SESSION['login'],
+                'byowner' => $this->input->post('byowner'),
                 'isactive' => 1
             );
           /*  Загрузим хелпер урлов для будущих редиректов. */
