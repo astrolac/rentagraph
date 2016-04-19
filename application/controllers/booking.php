@@ -29,74 +29,56 @@ class Booking extends CI_Controller {
             );
           /*  Сформируем заголовок для пользователя. */
             $data['title'] = "Все брони";
+          /*  Получим все активные отели. */
+            $allhotels = $this->hotels_model->get_hotels();
           /*  Получим период всех активных броней. */
             $period = $this->hotels_model->get_active_bookings_period();
           /*  Загрузим хелпер дат. */
             $this->load->helper('date');
           /*  Получим массив дат периода. */
             $datesarray = date_range($period[0], $period[1]);
-          /*  Получим все активные отели. */
-            $allhotels = $this->hotels_model->get_hotels();
-          /*
-              Далее для каждого отеля выберем все брони. Всё затолкаем в массив.
-              Затем будем формировать итоговый массив для построения таблицы.
-              Массив будет многомерным, каждый элемент будет являться массивом
-              содержащим дату, номер брони, признак брони владельца.
-              На основе этих данных затем постоится таблица в которой на каждую
-              дату будет заполняться ячейка: при наличии брони заливается зеленым
-              и вставляется номер брони, при наличии признака брони владельца
-              заливается темно серым и проставляется символы "БР". Если брони нет -
-              пустая, белая ячейка.
-          */
-          /*  Создадим пустой массив для всех броней, всех отелей. */
-            $allbookings = array();
+          /*  Сформируем пустой массив для конечного итога. */
+            $finish = array();
+          /*  Для каждого отеля ... */
+            foreach($allhotels as $hotelitem) {
+              /*  Сформируем элемент массива с ключем uid отеля и пустым массивом в качестве значения. */
+                $finish[$hotelitem['uid']]=array();
+              /*  Для каждой даты из диапазона дат всех броней ... */
+                foreach($datesarray as $currentdate) {
+                  /*  Для текущего uid отеля сформируем элемент массива с ключем текущей даты
+                      и пустым массивом в качестве значения. */
+                    $finish[$hotelitem['uid']][$currentdate] = array();
+                }
+            }
           /*  Для каждого отеля из полученного массива отелей ... */
             foreach($allhotels as $hotelitem) {
               /*  Получим все записи о бронировании. */
                 $hotelbookings = $this->hotels_model->get_bookings($hotelitem['uid']);
-              /*  Создадим первый элемент результирующей строки, в который запишем данные
-                  о том отеле, которому принадлежит эта строка. */
-                $hotelresult = array( 'huid' => $hotelitem['uid'],
-                                      'hname' => $hotelitem['hname'],
-                                      'bookings' => array()
-                               );
               /*  Далее, для каждой брони текущего отеля ... */
                 foreach($hotelbookings as $currentbooking) {
                   /*  Получим диапазон дат текущей брони. */
                     $bookingdaterange = date_range($currentbooking['datein'], $currentbooking['dateout']);
                   /*  Для каждой даты полученного диапазона ... */
                     foreach($bookingdaterange as $currentdate) {
-                      /*  Сформируем массив c данными брони для текущей даты и добавим его
-                          в конец массива результирующей строки. */
-                        $hotelresult['bookings'][] = array(
-                                            'date' => $currentdate,
-                                            'buid' => $currentbooking['uid'],
-                                            'byowner' => $currentbooking['byowner']
-                                          );
-                    }
-                }
-              /*  Добавим в массив всех броней строку с разобранными бронями текущего отеля. */
-                $allbookings[] = $hotelresult;
-            }
-          /*  Теперь у нас есть большой массив с данными, где все брони разобраны по датам,
-              с данными того какая бронь в какой дате в разрезе отелей. Далее нужно составить
-              результирующий массив-таблицу для всех дат глобального диапазона броней.
-              Важно учесть, что брони могут пересекаться по первой/последней дате. */
-            $finish = array();
-            foreach ($allbookings as $currenthotel) {
-                $hotelresult = array( 'huid' => $currenthotel['huid'],
-                                      'hname' => $currenthotel['hname'],
-                                      'dateinfo' => array()
-                                );
-                foreach($datesarray as $currentdate) {
-                    $curdateinfo = array('date' => $currentdate);
-
-                    foreach($currenthotel['bookings'] as $booking) {
-
+                      /*  В результирующий массив по ключу uid отеля и соответствующей даты
+                          добавим данные о брони. */
+                        $finish[$hotelitem['uid']][$currentdate][] = array(
+                                    'buid' => $currentbooking['uid'],
+                                    'byowner' => $currentbooking['byowner']
+                                    );
                     }
                 }
             }
-
+          /*
+              Получается следующая структура ...
+                'uid отеля' => массив
+                                'дата' => массив
+                                            массив бронь 1
+                                            массив бронь 2
+                                'дата' => пустой массив
+                                'дата' => массив
+                                            массив бронь 1
+          */
 
 //            $data['str'] = "Начало периода: ".$period[0]." Конец периода: ".$period[1];
 
