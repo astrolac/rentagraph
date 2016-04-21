@@ -107,6 +107,12 @@ thead {
   color: white;
 }
 
+td.booking {
+  text-align: center;
+  margin: 0;
+  padding: 0px 5px;
+}
+
 td.numeric {
   text-align: right;
   margin: 0;

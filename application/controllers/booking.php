@@ -31,11 +31,26 @@ class Booking extends CI_Controller {
             $data['title'] = "Все брони";
           /*  Получим все активные отели. */
             $allhotels = $this->hotels_model->get_hotels();
+          /*  Создадим массив наименований отелей для передачи в представление,
+              чтобы потом не мучать БД, для поиска имен, т.к. массив с бронями в качестве
+              ключей будет использовать uid отеля. */
+            $hotelsname = array();
+            foreach($allhotels as $hotelitem) {
+                $hotelsname[$hotelitem['uid']] = $hotelitem['hname'];
+            }
           /*  Получим период всех активных броней. */
             $period = $this->hotels_model->get_active_bookings_period();
           /*  Загрузим хелпер дат. */
             $this->load->helper('date');
-          /*  Получим массив дат периода. */
+          /*  Получим массив дат периода.
+            2016-04-21 Вот тут есть важное дополнение.
+              Чтобы эта функция корректно работала нужно обязательно в php.ini задать
+              значение для параметра date.timezone. Либо задавать его через функцию php
+              date_default_timezone_set(). Возможно, когда будем реализовывать функционал
+              для разных регионов сможем использовать эту функцию для задания значения timezone
+              в рамказ локальных сессий. Чтобы была возможность заводить пользователей из
+              разных часовых поясов. Также в такой ситуации сможет помочь функция timezone_menu()
+              из хелпера Date самого CI. */
             $datesarray = date_range($period[0], $period[1]);
           /*  Сформируем пустой массив для конечного итога. */
             $finish = array();
@@ -82,6 +97,10 @@ class Booking extends CI_Controller {
 
 //            $data['str'] = "Начало периода: ".$period[0]." Конец периода: ".$period[1];
 
+          /*  Загоним в массив data данные о периоде и всех бронях для передачи в представление. */
+            $data['datesarray'] = $datesarray;
+            $data['finish'] = $finish;
+            $data['hotelsname'] = $hotelsname;
           /*  Отобразим необходимые представления. */
             $this->load->view('header', $data);
             $this->load->view('mainmenu', $data);
