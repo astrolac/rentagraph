@@ -12,7 +12,9 @@
         <tr>
           <td>Наименование отеля</td>
           <?php foreach ($datesarray as $dateitem) { ?>
-                <td><?php echo $dateitem; ?></td>
+                <td><?php
+                    echo "<u>".substr($dateitem, -2)."/".substr($dateitem, 5, 2)."</u><br />".substr($dateitem, 0, 4);
+                ?></td>
           <?php } ?>
         </tr>
       </thead>
@@ -26,25 +28,25 @@
                       switch(count($hoteldata[$dateitem])) {
                           case 1:   echo "style=\"background-color: lime;\">";
                                     if($hoteldata[$dateitem][0]['byowner'] == 'on') {
-                                        $resstr = "БР (".$hoteldata[$dateitem][0]['buid'].")";
+                                        $resstr = $hoteldata[$dateitem][0]['buid']."(БВ)";
                                     } else {
                                         $resstr = $hoteldata[$dateitem][0]['buid'];
                                     }
                                     break;
                           case 2:   echo "style=\"background-color: lime;\">";
                                     if($hoteldata[$dateitem][0]['byowner'] == 'on') {
-                                        $resstr = "БР (".$hoteldata[$dateitem][0]['buid'].")";
+                                        $resstr = "<u>".$hoteldata[$dateitem][0]['buid']."(БВ)</u>";
                                     } else {
-                                        $resstr = $hoteldata[$dateitem][0]['buid'];
+                                        $resstr = "<u>".$hoteldata[$dateitem][0]['buid']."</u>";
                                     }
-                                    $resstr .= "/";
+                                    $resstr .= "<br />";
                                     if($hoteldata[$dateitem][1]['byowner'] == 'on') {
-                                        $resstr .= "<br />БР (".$hoteldata[$dateitem][1]['buid'].")";
+                                        $resstr .= $hoteldata[$dateitem][1]['buid']."(БВ)";
                                     } else {
-                                        $resstr .= "<br />".$hoteldata[$dateitem][1]['buid'];
+                                        $resstr .= $hoteldata[$dateitem][1]['buid'];
                                     }
                                     break;
-                          case 0:   echo ">";
+                          case 0:   echo "style=\"border: 1px solid black;\">";
                                     break;
                           default:  echo ">err";
                                     break;

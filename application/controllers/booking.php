@@ -24,8 +24,11 @@ class Booking extends CI_Controller {
             $data = $this->baselib->makedataarray();
           /*  Сформируем массив с внутренним меню представления. */
             $data['innermenu'] = array (
-                'Добавить' => $this->config->item('base_url')."index.php/booking/booking_add/",
-                'Отменить' => $this->config->item('base_url')."index.php/booking/booking_cancel/"
+                'Отобразить период'  => $this->config->item('base_url')."index.php/booking/booking_show_period/",
+                'Показать по отелю' => $this->config->item('base_url')."index.php/booking/booking_show_detail/",
+                'Добавить бронь' => $this->config->item('base_url')."index.php/booking/booking_add/",
+                'Снять бронь' => $this->config->item('base_url')."index.php/booking/booking_cancel/",
+
             );
           /*  Сформируем заголовок для пользователя. */
             $data['title'] = "Все брони";
@@ -40,6 +43,21 @@ class Booking extends CI_Controller {
             }
           /*  Получим период всех активных броней. */
             $period = $this->hotels_model->get_active_bookings_period();
+          /*  2016-04-22 По просьбе заказчика ограничиваем начало периода вчерашним днем. */
+          /*  Получим текущую Unix метку времени. */
+            $unixtime = time();
+          /*  Вычтем из неё 24 часа по 60 мин и 60 секунд, т.е. сутки выраженные в секундах. */
+            $unixtime -= 24 * 60 * 60;
+          /*  В начальную дату периода затолкаем полученное значение, приведенное в строку. */
+            $period[0] = date('Y-m-d', $unixtime);
+          /*  Если входными параметрами заданы даты налача/конца периода, то подменим ими
+              значения полученные перед этим. */
+            if($datestart) {
+                $period[0] = $datestart;
+            }
+            if($dateend) {
+                $period[1] = $dateend;
+            }
           /*  Загрузим хелпер дат. */
             $this->load->helper('date');
           /*  Получим массив дат периода.
@@ -94,9 +112,6 @@ class Booking extends CI_Controller {
                                 'дата' => массив
                                             массив бронь 1
           */
-
-//            $data['str'] = "Начало периода: ".$period[0]." Конец периода: ".$period[1];
-
           /*  Загоним в массив data данные о периоде и всех бронях для передачи в представление. */
             $data['datesarray'] = $datesarray;
             $data['finish'] = $finish;
@@ -105,7 +120,6 @@ class Booking extends CI_Controller {
             $this->load->view('header', $data);
             $this->load->view('mainmenu', $data);
             $this->load->view('bookings_show', $data);
-//            $this->load->view('testv', $data);
             $this->load->view('footer', $data);
         }
     }
@@ -247,6 +261,18 @@ class Booking extends CI_Controller {
               /*  И сделаем редирект. */
                 redirect('booking/booking_add_form/'.$bookinginfo['huid']);
             }
+        }
+    }
+
+    /*
+        Функция запроса номера брони для отмены.
+    */
+    public function booking_cancel($buid) {
+        if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE) {
+          /*  Загрузим универсальные данные. */
+            $data = $this->baselib->makedataarray();
+            $data['title'] = "Снять бронь";
+
         }
     }
 
