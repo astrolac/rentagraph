@@ -10,9 +10,9 @@
   <table class="hotels">
       <thead>
         <tr>
-          <td>Наименование отеля</td>
+          <td style="min-width: 170px;">Наименование отеля</td>
           <?php foreach ($datesarray as $dateitem) { ?>
-                <td><?php
+                <td style="min-width: 40px; height: 40px;"><?php
                     echo "<u>".substr($dateitem, -2)."/".substr($dateitem, 5, 2)."</u><br />".substr($dateitem, 0, 4);
                 ?></td>
           <?php } ?>
@@ -21,19 +21,23 @@
       <tbody>
           <?php foreach ($finish as $huid => $hoteldata) { ?>
           <tr>
-              <td><?php echo $hotelsname[$huid]; ?></td>
+              <td style="min-width: 170px;">
+                  <a href="<?php
+                      echo $this->config->item('base_url')."index.php/booking/bookings_by_hotel/".$huid;
+                      ?>"><?php echo $hotelsname[$huid]; ?></a>
+              </td>
               <?php foreach ($datesarray as $dateitem) { ?>
-                  <td class="booking"<?php
+                  <td class="booking" style="min-width: 40px; height: 40px; <?php
                       $resstr = "";
                       switch(count($hoteldata[$dateitem])) {
-                          case 1:   echo "style=\"background-color: lime;\">";
+                          case 1:   echo "background-color: lime;\">";
                                     if($hoteldata[$dateitem][0]['byowner'] == 'on') {
                                         $resstr = $hoteldata[$dateitem][0]['buid']."(БВ)";
                                     } else {
                                         $resstr = $hoteldata[$dateitem][0]['buid'];
                                     }
                                     break;
-                          case 2:   echo "style=\"background-color: lime;\">";
+                          case 2:   echo "background-color: lime;\">";
                                     if($hoteldata[$dateitem][0]['byowner'] == 'on') {
                                         $resstr = "<u>".$hoteldata[$dateitem][0]['buid']."(БВ)</u>";
                                     } else {
@@ -46,7 +50,7 @@
                                         $resstr .= $hoteldata[$dateitem][1]['buid'];
                                     }
                                     break;
-                          case 0:   echo "style=\"border: 1px solid black;\">";
+                          case 0:   echo "border: 1px solid black;\">";
                                     break;
                           default:  echo ">err";
                                     break;

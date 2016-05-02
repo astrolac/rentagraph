@@ -25,7 +25,6 @@ class Booking extends CI_Controller {
           /*  Сформируем массив с внутренним меню представления. */
             $data['innermenu'] = array (
                 'Отобразить период'  => $this->config->item('base_url')."index.php/booking/booking_show_period/",
-                'Показать по отелю' => $this->config->item('base_url')."index.php/booking/booking_show_detail/",
                 'Добавить бронь' => $this->config->item('base_url')."index.php/booking/booking_add/",
                 'Снять бронь' => $this->config->item('base_url')."index.php/booking/booking_cancel/",
 
@@ -139,6 +138,11 @@ class Booking extends CI_Controller {
             $data['hotelsarray'] = $this->hotels_model->get_hotels(FALSE);
           /*  Сформируем заголовок для пользователя. */
             $data['title'] = "Выберете отель";
+          /*  Сформируем переменную с ссылкой которая будет на имени отеля.
+            2016-04-27 Это добавлено для того, чтобы использовать это представление
+              не только для этой функции, но и для тех где требуется аналогичный
+              выбор отеля и передача его uid по ссылке. */
+            $data['href'] = $this->config->item('base_url')."index.php/booking/booking_add_form/";
           /*  Отобразим необходимые представления. */
             $this->load->view('header', $data);
             $this->load->view('mainmenu', $data);
@@ -161,11 +165,22 @@ class Booking extends CI_Controller {
             $data['title'] = "Добавить бронь для \"".$hotel['hname']."\"";
           /*  В этой переменной передадим uid отеля. */
             $data['huid'] = $huid;
-
+          /*  Проверим, если есть информация об ошибке, то запомним ее для
+              передачи в форму. */
             if(isset($_SESSION['errorinfo'])) {
+              /*  Здесь передаем текст ошибки. */
                 $data['errortext'] = $_SESSION['errorinfo']['etext'];
+              /*  Здесь информация для формы, чтобы не заполнять заново. */
                 $data['forminfo'] = $_SESSION['errorinfo']['forminfo'];
+              /*  Здесь некая лажа, которую будет обрабатывать представление. */
                 $data['addinfo'] = $_SESSION['errorinfo']['blob'];
+              /*  Проверим не редактирование ли формы происходит и если да,
+                  то сообщим форме об этом. */
+                if($_SESSION['errorinfo']['isedit'] == "YES") {
+                    $data['isedit'] = "YES";
+                }
+              /*  Разрегестрируем переменную, чтобы она больше не болталась,
+                  т.к. она больше не нужна. */
                 unset($_SESSION['errorinfo']);
             }
           /*  Загрузим хелпер форм. */
@@ -195,7 +210,9 @@ class Booking extends CI_Controller {
                                   'Сумма предоплаты',
                                   'Дата внесения предоплаты',
                                   'Комментарии',
-                                  'Бронь владельца'
+                                  'Бронь владельца',
+                                  'Поставил бронь',
+                                  'Дата/время бронирования'
                                 )
                               );
               /*  Теперь отобразим лажу. */
@@ -226,16 +243,40 @@ class Booking extends CI_Controller {
                 'byowner' => $this->input->post('byowner'),
                 'isactive' => 1
             );
+          /*  Получим значение переменной-индикатора редактирования. */
+            $isedit = $this->input->post('isedit');
+          /*  Примем uid брони если редактирование. */
+            $buid = $this->input->post('buid');
+          /*  Это также для режима редактирования. */
+            if($bookinginfo['beforepaydate'] == '0000-00-00') {
+                $bookinginfo['beforepaydate'] = '';
+            }
+            if(!is_string($bookinginfo['byowner'])) {
+                $bookinginfo['byowner'] = '';
+            }
           /*  Загрузим хелпер урлов для будущих редиректов. */
             $this->load->helper('url');
           /*  Сейчас будем проверять не перекрывает ли новая бронь уже существующие.
               Сначала получим все брони которые пересекаются с введенной. */
+          /*  2016-05-01
+              Тут есть один момент, если это редактирование брони, то она будет пересекаться
+              сама с собой. Чтобы этого не происходило, то нужно сделать передачу uid брони
+              в запрос, а в самом запросе, в случае передачи номера брони исключать ее из
+              поиска. */
             $res = $this->hotels_model->get_bookings( $bookinginfo['huid'],
                                                       $bookinginfo['datein'],
-                                                      $bookinginfo['dateout']);
+                                                      $bookinginfo['dateout'],
+                                                      $buid);
             if (count($res) == 0) {
-              /*  Если никаких броней пересекающейся с нашей нет, то добавим данные в БД. */
-                $this->hotels_model->insert_booking($bookinginfo);
+              /*  Если никаких броней пересекающейся с нашей нет, то
+                  добавим данные в БД, или проапдейтим текущую запись. */
+                if($isedit == "YES") {
+                  /*  Если да, то проапдейтим запись. */
+                    $this->hotels_model->update_booking($buid, $bookinginfo);
+                } else {
+                  /*  Если нет, то значит запись новая и добавляем новую запись. */
+                    $this->hotels_model->insert_booking($bookinginfo);
+                }
               /*  Редирект на общую страницу бронирования. */
                 redirect('booking/bookings');
             } else {
@@ -247,17 +288,32 @@ class Booking extends CI_Controller {
                   отображении формы введенные данные были сохранены. */
                 unset($bookinginfo['userlogin']);
                 unset($bookinginfo['isactive']);
+                /*$datein = $this->input->post('datein');
+                $bookinginfo['datein'] = substr($datein, -2)."-".substr($datein, 5, 2)."-".substr($datein, 0, 4);
+                $dateout = $this->input->post('dateout');
+                $bookinginfo['dateout'] = substr($dateout, -2)."-".substr($dateout, 5, 2)."-".substr($dateout, 0, 4);
+                $beforepaydate = $this->input->post('beforepaydate');
+                $bookinginfo['beforepaydate'] = substr($beforepaydate, -2)."-".substr($beforepaydate, 5, 2)."-".substr($beforepaydate, 0, 4);*/
                 $bookinginfo['datein'] = $this->input->post('datein');
                 $bookinginfo['dateout'] = $this->input->post('dateout');
                 $bookinginfo['beforepaydate'] = $this->input->post('beforepaydate');
+
               /*  Теперь сформируем сам массив для отображения ошибки. */
                 $errorinfo = array (
-                    'etext' => 'Новая бронь пересекается с одной из существующих!',
+                    'etext' => 'Бронь пересекается с одной из существующих!',
                     'forminfo' => $bookinginfo,
                     'blob' => $res,
                 );
               /*  Запомним эти данные в сессии. */
                 $_SESSION['errorinfo'] = $errorinfo;
+              /*  Если это редактирование то надо сообщить об этом или об обратном. */
+                if($isedit == "YES") {
+                    $_SESSION['errorinfo']['isedit'] = "YES";
+                  /*  Добавим информацию о номере брони. */
+                    $_SESSION['errorinfo']['forminfo']['uid'] = $buid;
+                } else {
+                    $_SESSION['errorinfo']['isedit'] = "NO";
+                }
               /*  И сделаем редирект. */
                 redirect('booking/booking_add_form/'.$bookinginfo['huid']);
             }
@@ -267,12 +323,140 @@ class Booking extends CI_Controller {
     /*
         Функция запроса номера брони для отмены.
     */
-    public function booking_cancel($buid) {
+    public function booking_cancel($buid = FALSE) {
         if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE) {
           /*  Загрузим универсальные данные. */
             $data = $this->baselib->makedataarray();
             $data['title'] = "Снять бронь";
+          /*  Загрузим хелпер форм. */
+            $this->load->helper('form');
+          /*  Отобразим заголовок страницы и главное меню. */
+            $this->load->view('header', $data);
+            $this->load->view('mainmenu', $data);
+          /*  Если нам передан номер брони ... */
+            if($buid) {
+              /*  Передадим в форму номер брони. */
+                $data['buid'] = $buid;
+              /*  Изменим заголовок. */
+                $data['title'] = "Вы отменяете бронь";
+              /*  Получим данные об отменяемой брони. */
+                $bookingdata = $this->hotels_model->get_booking_data($buid);
+              /*  Получим имя отеля. */
+                $hotelname = $this->hotels_model->get_hotels($bookingdata['huid']);
+                $hotelname = $hotelname['hname'];
+              /*  Сформируем массив для отображения дополнительной информации. */
+                $data['addinfo'] = array(
+                    array(
+                        'Номер брони',
+                        'Отель',
+                        'Дата заезда',
+                        'Дата выезда',
+                        'Гость',
+                        'Комментарии',
+                        'Бронь владельца'
+                    ), array (
+                        $bookingdata['uid'],
+                        $hotelname,
+                        substr($bookingdata['datein'], -2)."-".substr($bookingdata['datein'], 5, 2)."-".substr($bookingdata['datein'], 0, 4),
+                        substr($bookingdata['dateout'], -2)."-".substr($bookingdata['dateout'], 5, 2)."-".substr($bookingdata['dateout'], 0, 4),
+                        /*$bookingdata['datein'],
+                        $bookingdata['dateout'],*/
+                        $bookingdata['person'],
+                        $bookingdata['comments'],
+                        $bookingdata['byowner']
+                    )
+                );
+              /*  Отобразим дополнительную информацию. */
+                $this->load->view('show_addinfo', $data);
+            }
+          /*  Теперь отобразим саму форму и футер. */
+            $this->load->view('booking_cancel_form', $data);
+            $this->load->view('footer', $data);
+        }
+    }
 
+    /*
+        Функция непосредственно отмены брони.
+    */
+    public function booking_cancel_job() {
+        if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE) {
+            $buid = intval($this->input->post('buid'));
+          /*  Если форма запроса номера уже отображалась, значит информация
+              об отменяемой брони уже отображалась и можно отменять бронь. */
+            if($this->input->post('isshown') == 'YES') {
+              /*  Загрузим хелпер урлов для будущих редиректов. */
+                $this->load->helper('url');
+              /*  Выполним функцию отмены брони модели, передав uid брони. */
+                $this->hotels_model->booking_cancel($buid);
+              /*  Сделаем редирект на страницу отображения всех броней. */
+                redirect('booking/bookings');
+            } else {
+              /*  Иначе снова выполним вызов функции отмены брони, но
+                  на вход подадим номер брони. */
+                $this->booking_cancel($buid);
+            }
+        }
+    }
+
+    /*
+        Функция редактирования брони.
+    */
+    public function booking_edit($buid) {
+        if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE) {
+          /*  Загрузим универсальные данные. */
+            $data = $this->baselib->makedataarray();
+          /*  Получим данные об изменяемой брони. */
+            $data['forminfo'] = $this->hotels_model->get_booking_data($buid);
+            $datein = $data['forminfo']['datein'];
+            $data['forminfo']['datein'] = substr($datein, -2)."-".substr($datein, 5, 2)."-".substr($datein, 0, 4);
+            $dateout = $data['forminfo']['dateout'];
+            $data['forminfo']['dateout'] = substr($dateout, -2)."-".substr($dateout, 5, 2)."-".substr($dateout, 0, 4);
+            $beforepaydate = $data['forminfo']['beforepaydate'];
+            $data['forminfo']['beforepaydate'] = substr($beforepaydate, -2)."-".substr($beforepaydate, 5, 2)."-".substr($beforepaydate, 0, 4);
+          /*  Скажем форме, что это редактирование существующей брони. */
+            $data['isedit'] = "YES";
+          /*  Получим имя отеля для заголовка. */
+            $hotelname = $this->hotels_model->get_hotels($data['forminfo']['huid']);
+            $hotelname = $hotelname['hname'];
+          /*  Сформируем заголовок. */
+            $data['title'] = "Вы изменяете данные брони №".$buid." отеля \"".$hotelname."\"";
+          /*  Загрузим хелпер форм. */
+            $this->load->helper('form');
+          /*  Отобразим заголовок страницы и главное меню. */
+            $this->load->view('header', $data);
+            $this->load->view('mainmenu', $data);
+          /*  Далее отобразим саму форму. */
+            $this->load->view('booking_add_form', $data);
+            $this->load->view('footer', $data);
+        }
+    }
+
+    /*
+        Функция отображения броней отеля.
+    */
+    public function bookings_by_hotel($huid) {
+        if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE) {
+          /*  Загрузим универсальные данные. */
+            $data = $this->baselib->makedataarray();
+          /**/
+            $data['innermenu'] = array (
+                'Добавить бронь' => $this->config->item('base_url')."index.php/booking/booking_add_form/".$huid
+            );
+          /*  Получим имя отеля. */
+            $hotelname = $this->hotels_model->get_hotels($huid);
+            $hotelname = $hotelname['hname'];
+          /*  Сформируем заголовок. */
+            $data['title'] = "Брони отеля ".$hotelname;
+          /*  Получим все активные брони отеля. */
+            $data['bookings'] = $this->hotels_model->get_bookings($huid);
+
+            $data['hrefedit'] = $this->config->item('base_url')."index.php/booking/booking_edit/";
+            $data['hrefcancel'] = $this->config->item('base_url')."index.php/booking/booking_cancel/";
+          /*  Отобразим необходимые представления. */
+            $this->load->view('header', $data);
+            $this->load->view('mainmenu', $data);
+            $this->load->view('bookings_by_hotel', $data);
+            $this->load->view('footer', $data);
         }
     }
 

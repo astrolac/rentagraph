@@ -13,31 +13,62 @@ class Hotels_model extends CI_Model {
         Функция возвращает все отели из таблицы, если не задан никакой uid, или
         только строку по заданному uid.
     */
-    public function get_hotels($hotelid = FALSE)
+    public function get_hotels($hotelid = FALSE, $isactive = 1)
     {
         if ($hotelid === FALSE) {
-            $query = $this->db->get_where('hotels', array('isactive' => 1));
+            $query = $this->db->get_where('hotels', array('isactive' => $isactive));
             return $query->result_array();
         }
 
-        $query = $this->db->get_where('hotels', array('uid' => $hotelid, 'isactive' => 1));
+        $query = $this->db->get_where('hotels', array('uid' => $hotelid, 'isactive' => $isactive));
         return $query->row_array();
     }
 
     /*
-        Функция добавляет отель с БД.
+        Функция добавляет отель в БД.
     */
     public function insert_hotel($data) {
         return $this->db->insert('hotels', $data);
     }
 
     /*
+        Функция обновляет данные об отеле.
+    */
+    public function update_hotel($huid, $data) {
+        $querystr = "UPDATE hotels SET";
+        foreach($data as $field => $value) {
+            $querystr .= " ".$field."=";
+            if(is_string($value)) {
+                $querystr .= "'".$value."',";
+            } else {
+                $querystr .= $value.",";
+            }
+        }
+
+        $querystr = substr($querystr,0,strlen($querystr)-1);
+
+        $querystr .= " WHERE uid=".$huid.";";
+
+        $query = $this->db->query($querystr);
+    }
+
+    /*
         Функия возвращает типы отелей.
+        Добавляет тип отеля.
+        Удаляет тип отеля.
     */
     public function get_htypes()
     {
         $query = $this->db->get('htypes');
         return $query->result_array();
+    }
+    public function htype_add($htype) {
+        $data = array ('htype' => $htype);
+        $this->db->insert('htypes', $data);
+    }
+    public function htype_del($htuid) {
+        $data = array ('uid' => $htuid);
+        $this->db->delete('htypes', $data);
     }
 
     /*
@@ -49,13 +80,16 @@ class Hotels_model extends CI_Model {
         периодов.
         Диапазон дат ограничен 01-01-1900 и 31-12-2100, думаю хватит ... или нет ... ?
     */
-    public function get_bookings($huid, $datein = FALSE, $dateout = FALSE) {
-        $querystr = "SELECT uid,datein,dateout,person,personphone,totalsum,beforepaysum,beforepaydate,comments,byowner from bookings WHERE huid=".$huid." AND isactive=1" ;
+    public function get_bookings($huid, $datein = FALSE, $dateout = FALSE, $buid = FALSE) {
+        $querystr = "SELECT uid,datein,dateout,person,personphone,totalsum,beforepaysum,beforepaydate,comments,byowner,userlogin,bookingtimestamp from bookings WHERE huid=".$huid." AND isactive=1" ;
         if ($datein) {
             $querystr .=" AND dateout>'".$datein."'";
         }
         if ($dateout) {
             $querystr .=" AND datein<'".$dateout."'";
+        }
+        if ($buid) {
+            $querystr .=" AND uid<>".$buid;
         }
         $querystr .=" ORDER BY datein;";
         $query = $this->db->query($querystr);
@@ -69,6 +103,27 @@ class Hotels_model extends CI_Model {
         return $this->db->insert('bookings', $data);
     }
 
+    /*
+        Функция апдейтит бронь.
+    */
+    public function update_booking($buid, $bookinginfo) {
+      $querystr = "UPDATE bookings SET";
+      foreach($bookinginfo as $field => $value) {
+          $querystr .= " ".$field."=";
+          if(is_string($value)) {
+              $querystr .= "'".$value."',";
+          } else {
+              $querystr .= $value.",";
+          }
+      }
+
+      $querystr = substr($querystr,0,strlen($querystr)-1);
+
+      $querystr .= " WHERE uid=".$buid.";";
+
+      $query = $this->db->query($querystr);
+    }
+
     public function test_get_bookings($huid, $datein = FALSE, $dateout = FALSE) {
         $querystr = "SELECT uid,datein,dateout,person,personphone,totalsum,beforepaysum,beforepaydate,comments,byowner from bookings WHERE huid=".$huid." AND isactive=1";
         if ($datein) {
@@ -80,6 +135,26 @@ class Hotels_model extends CI_Model {
         $querystr .=" ORDER BY datein;";
 
         return $querystr;
+    }
+
+    /*
+        Функция исполнения запроса отмены брони. Фактически апдейтит
+        бронь переводя ее в неактивное состояние (isactive = 0).
+    */
+    public function booking_cancel($buid) {
+        if($buid) {
+            $data = array('isactive' => 0);
+            $this->db->where('uid', $buid);
+            $this->db->update('bookings', $data);
+        }
+    }
+
+    /*
+        Функция получения данных по заданной брони.
+    */
+    public function get_booking_data($buid) {
+        $query = $this->db->get_where('bookings', array('uid' => $buid));
+        return $query->row_array();
     }
 
     /*

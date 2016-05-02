@@ -78,16 +78,21 @@ class Base extends CI_Controller {
     /*
         Функция выводит форму для добавления отеля.
     */
-    public function hotelsadd() {
+    public function hotelsadd($huid = FALSE) {
         if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE) {
             $data = $this->baselib->makedataarray();
 
-            $data['title'] = "Добавить отель";
+            if($huid == FALSE) {
+                $data['title'] = "Добавить отель";
+            } else {
+                $data['title'] = "Изменение данных об отеле";
+                $data['hoteldata'] = $this->hotels_model->get_hotels($huid);
+            }
 
-            /* Загрузим типы отелей. */
+          /*  Загрузим типы отелей. */
             $htypes = $this->hotels_model->get_htypes();
             $data['htypes'] = array();
-            /* Сформируем массив с типами отелей для представления. */
+          /*  Сформируем массив с типами отелей для представления. */
             foreach ($htypes as $value) {
                 $data['htypes'][] = $value['htype'];
             }
@@ -103,10 +108,11 @@ class Base extends CI_Controller {
 
     /*
         Функия обрабатывает данные от формы добавления отеля и добавляет отель в БД.
+        Если передан признак редактирования, то данные об отеле обновляют существующие.
     */
     public function hotelsadd_job() {
         if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE) {
-            /* Сформируме массив с переданными данными. */
+          /*  Сформируме массив с переданными данными. */
             $data = array(
                 'hname' => $this->input->post('hname'),
                 'htype' => $this->input->post('htype'),
@@ -119,34 +125,146 @@ class Base extends CI_Controller {
                 'price' => floatval(str_replace(",",".",$this->input->post('price'))),
                 'isactive' => 1
             );
+          /*  Проверим, не передан ли нам признак того что данные
+              для редактирования отеля, а не для добавления. */
+            if($this->input->post('isedit') == "YES") {
+              /*  Если признак есть, то дополнительно извлекаем uid отеля и запускаем
+                  функцию апдейта отеля в модели. */
+                $huid = intval($this->input->post('huid'));
+                $this->hotels_model->update_hotel($huid, $data);
+            } else {
+              /*  Иначе запускаем функцию добавления записи об отеле. */
+                $this->hotels_model->insert_hotel($data);
+            }
 
-            $this->hotels_model->insert_hotel($data);
-
-            /* Загрузим библиотеку помощника по url-ам и вызовем функцию редиректа. */
+          /*  Загрузим библиотеку помощника по url-ам и вызовем функцию редиректа. */
             $this->load->helper('url');
             redirect('base/hotelsmaintain');
         }
     }
 
     /*
-        Функция отображения/добавления/удаления типов отелей.
+        Функция редактирования отеля.
     */
-    public function htypes() {
+    public function hotelsedit() {
         if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE) {
             $data = $this->baselib->makedataarray();
-
-            $data['innermenu'] = array (
-                'Добавить' => $this->config->item('base_url')."index.php/base/htypeadd/",
-                'Удалить' => $this->config->item('base_url')."index.php/base/htypedel/",
-            );
-
-            $data['hotelsarray'] = $this->hotels_model->get_htypes();
-            /* Зададим заголовок для страницы. */
-            $data['title'] = 'Типы отелей';
-
+            $data['innermenu'] = array();
+          /*  Загрузим отели для отображения. */
+            $data['hotelsarray'] = $this->hotels_model->get_hotels(FALSE);
+          /*  Сформируем заголовок для пользователя. */
+            $data['title'] = "Выберете отель";
+          /*  Сформируем переменную с ссылкой которая будет на имени отеля.
+            2016-04-27 Это добавлено для того, чтобы использовать это представление
+              не только для этой функции, но и для тех где требуется аналогичный
+              выбор отеля и передача его uid по ссылке. */
+            $data['href'] = $this->config->item('base_url')."index.php/base/hotelsadd/";
+          /*  Отобразим необходимые представления. */
             $this->load->view('header', $data);
             $this->load->view('mainmenu', $data);
-            /*$this->load->view('showhtypes', $data);*/
+            $this->load->view('booking_hselect', $data);
+            $this->load->view('footer', $data);
+        }
+    }
+
+    /*
+        Функция блокировки отеля.
+    */
+    public function hotelsdel($huid = FALSE) {
+        if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE) {
+          /*  Если uid отеля передан, значит мы уже после формы выбора отеля
+              и нужно просто перевести выбранный отель в статус неактивного. */
+            if($huid) {
+                $data = array('isactive' => 0);
+                $this->hotels_model->update_hotel($huid, $data);
+              /*  Загрузим хелпер урлов для будущих редиректов. */
+                $this->load->helper('url');
+              /*  Сделаем редирект на страницу отображения всех броней. */
+                redirect('base/hotelsmaintain');
+            } else {
+              /*  Иначе выдаем штатно страницу выбора отеля. */
+                $data = $this->baselib->makedataarray();
+                $data['innermenu'] = array();
+              /*  Загрузим отели для отображения. */
+                $data['hotelsarray'] = $this->hotels_model->get_hotels(FALSE);
+              /*  Сформируем заголовок для пользователя. */
+                $data['title'] = "Выберете отель для блокировки";
+              /*  Ссылка на страницу-обработчик. */
+                $data['href'] = $this->config->item('base_url')."index.php/base/hotelsdel/";
+              /*  Отобразим необходимые представления. */
+                $this->load->view('header', $data);
+                $this->load->view('mainmenu', $data);
+                $this->load->view('booking_hselect', $data);
+                $this->load->view('footer', $data);
+            }
+        }
+    }
+
+    /*
+        Функция разблокировки отеля.
+    */
+    public function hotelsrev($huid = FALSE) {
+        if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE) {
+          /*  Если uid отеля передан, значит мы уже после формы выбора отеля
+              и нужно просто перевести выбранный отель в статус активного. */
+            if($huid) {
+                $data = array('isactive' => 1);
+                $this->hotels_model->update_hotel($huid, $data);
+              /*  Загрузим хелпер урлов для будущих редиректов. */
+                $this->load->helper('url');
+              /*  Сделаем редирект на страницу отображения всех броней. */
+                redirect('base/hotelsmaintain');
+            } else {
+              /*  Иначе выдаем штатно страницу выбора отеля. */
+                $data = $this->baselib->makedataarray();
+                $data['innermenu'] = array();
+              /*  Загрузим отели для отображения. Вторым парамтером передаем состочние
+                  поля isactive в таблице с отелями. */
+                $data['hotelsarray'] = $this->hotels_model->get_hotels(FALSE,0);
+              /*  Сформируем заголовок для пользователя. */
+                $data['title'] = "Выберете отель для разблокировки";
+              /*  Ссылка на страницу-обработчик. */
+                $data['href'] = $this->config->item('base_url')."index.php/base/hotelsrev/";
+              /*  Отобразим необходимые представления. */
+                $this->load->view('header', $data);
+                $this->load->view('mainmenu', $data);
+                $this->load->view('booking_hselect', $data);
+                $this->load->view('footer', $data);
+            }
+        }
+    }
+
+    /*
+        Функция отображения/добавления/удаления типов отелей.
+    */
+    public function htypes($htuid = FALSE) {
+        if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE) {
+            $data = $this->baselib->makedataarray();
+          /*  Если нам передали htuid то значит нажата кнопка удаления типа отеля.
+              Т.о. просто удаляем соответствующий тип отеля.
+              Если не передавали, то это либо просто вход в функцию из меню,
+              либо добавление нового типа из формы. В случае добавления нового типа
+              у нас будут значения в переменных переданных в POST. */
+            if($htuid) {
+                $this->hotels_model->htype_del($htuid);
+            }
+            if($this->input->post('htype')) {
+                $this->hotels_model->htype_add($this->input->post('htype'));
+            }
+
+            $data['innermenu'] = array ();
+
+            $this->load->helper('form');
+          /*  Получим типы отелей. */
+            $data['htypes'] = $this->hotels_model->get_htypes();
+          /*  Сформируем урл для удаления типа отеля. */
+            $data['hrefdel'] = $this->config->item('base_url')."index.php/base/htypes/";
+          /*  Зададим заголовок для страницы. */
+            $data['title'] = 'Типы отелей';
+          /*  Отображаем представления. */
+            $this->load->view('header', $data);
+            $this->load->view('mainmenu', $data);
+            $this->load->view('showhtypes', $data);
             $this->load->view('footer', $data);
         }
     }

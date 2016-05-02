@@ -3,9 +3,43 @@
     <script src="<?php echo base_url(); ?>noCI_lib/datepicker/tcal.js" type="text/javascript"></script>
     <h2><?php echo $title; ?></h2>
 </div>
+<!-- <div>
+  <pre>
+    <?php /*
+      if(isset($isedit) && $isedit == "YES") {
+        foreach($forminfo as $key => $value) {
+            echo "Key: ".$key." Value: ".$value."\n";
+        }
+      }
+    */ ?>
+  </pre>
+</div> -->
 <div class="dform">
 <?php echo form_open('booking/booking_add_job'); ?>
-    <input type="hidden" name="huid" value="<?php echo $huid; ?>" />
+    <input type="hidden" name="huid" value="<?php
+        if(isset($isedit) && $isedit == "YES") {
+            echo $forminfo['huid'];
+        } else {
+            echo $huid;
+        }
+    ?>" />
+
+    <input type="hidden" name="buid" value="<?php
+        if(isset($isedit) && $isedit == "YES") {
+            echo $forminfo['uid'];
+        } else {
+            echo "FALSE";
+        }
+    ?>" />
+
+    <input type="hidden" name="isedit" value="<?php
+        if(isset($isedit) && $isedit == "YES") {
+            echo "YES";
+        } else {
+            echo "NO";
+        }
+    ?>" />
+
     <table class="tform">
       <tbody>
 
@@ -87,7 +121,13 @@
         </tr>
 
         <tr>
-            <td colspan="4" class="button"><input type="submit" name="submit" value="Добавить" /></td>
+            <td colspan="4" class="button"><input type="submit" name="submit" value="<?php
+                if(isset($isedit) && $isedit == "YES") {
+                    echo "Изменить";
+                } else {
+                    echo "Добавить";
+                }
+            ?>" /></td>
         </tr>
       </tbody>
     </table>

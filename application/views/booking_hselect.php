@@ -30,7 +30,7 @@
               foreach ($hotelsarray as $row) {
                   echo "<tr>";
                       echo "<td class=\"numeric\">".$row['uid']."</td>";
-                      echo "<td><a href=\"".$this->config->item('base_url')."index.php/booking/booking_add_form/".$row['uid']."\">".$row['hname']."</a></td>";
+                      echo "<td><a href=\"".$href.$row['uid']."\">".$row['hname']."</a></td>";
                       echo "<td>"."</td>";
                   echo "</tr>";
               }
