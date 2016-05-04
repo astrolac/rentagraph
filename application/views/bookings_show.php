@@ -7,7 +7,7 @@
     ?>
 </div>
 <div id="bookings">
-  <table class="hotels">
+  <table class="bookings">
       <thead>
         <tr>
           <td style="min-width: 170px;">Наименование отеля</td>

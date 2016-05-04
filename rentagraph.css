@@ -87,7 +87,7 @@
   text-align: center;
 }
 /*
-    Стили для таблицы с отелями
+    Стили для таблицы с отелями и др.
 */
 table.hotels {
   font-family: Calibri, Helvetica, Verdana, Arial;
@@ -95,6 +95,18 @@ table.hotels {
   /*border: 1px solid black;*/
   margin: 5px auto;
   width: 95%;
+}
+
+table.bookings {
+  font-family: Calibri, Helvetica, Verdana, Arial;
+  font-size: 10pt;
+  /*border: 1px solid black;*/
+  margin: 5px auto;
+  width: 95%;
+}
+
+table.hotels tbody tr {
+  background: #e0e0e0;
 }
 
 thead {
