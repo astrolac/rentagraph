@@ -20,20 +20,31 @@
     <table class="hotels">
       <thead>
           <tr>
-              <td class="theader">UID</td>
-              <td class="theader">Наименование</td>
+              <td class="theader" colspan="2">Наименование</td>
               <td class="theader">Текущие брони</td>
           </tr>
       </thead>
       <tbody>
           <?php
-              foreach ($hotelsarray as $row) {
-                  echo "<tr>";
-                      echo "<td class=\"numeric\">".$row['uid']."</td>";
-                      echo "<td><a href=\"".$href.$row['uid']."\">".$row['hname']."</a></td>";
-                      echo "<td>"."</td>";
-                  echo "</tr>";
+          foreach($hnames as $huid => $hndata) {
+              echo "<tr>";
+                echo "<td colspan=\"2\">";
+                    if(!count($hndata['chotels'])) {
+                        echo "<a href=\"".$href.$huid."\">".$hndata['hname']."</a>";
+                    } else {
+                        echo $hndata['hname'];
+                    }
+                echo "</td>";
+              echo "</tr>";
+              if(count($hndata['chotels'])) {
+                  foreach($hndata['chotels'] as $huid => $hname) {
+                    echo "<tr>";
+                      echo "<td style=\"width: 20px;\"></td>";
+                      echo "<td><a href=\"".$href.$huid."\">".$hname."</a></td>";
+                    echo "</tr>";
+                  }
               }
+          }
           ?>
       </tbody>
     </table>

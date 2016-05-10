@@ -47,6 +47,21 @@
             </tr>
 
             <tr>
+                <td class="label">Родительский отель</td>
+                <td class="input">
+                    <select name="puid" size="1">
+                        <option value="0">Отсутствует</option>
+                        <?php foreach ($hnames as $key => $value) { ?>
+                        <option value="<?php echo $key; ?>"<?php
+                            if(isset($hoteldata) && $hoteldata['puid'] == $key) {
+                                echo " selected";
+                            }
+                        ?>><?php echo $value['hname']; ?></option>
+                        <?php } ?>
+                    </select>
+            </tr>
+
+            <tr>
                 <td class="label">Контактное лицо (хозяин)</td>
                 <td class="input"><textarea name="person" maxlength="1024" rows="5" cols="80"><?php
                     if(isset($hoteldata)) {
@@ -96,15 +111,6 @@
                 <td class="input"><input type="text" name="fixedfee" value="<?php
                     if(isset($hoteldata)) {
                         echo $hoteldata['fixedfee'];
-                    }
-                ?>" size="50"/></td>
-            </tr>
-
-            <tr>
-                <td class="label">Цена</td>
-                <td class="input"><input type="text" name="price" value="<?php
-                    if(isset($hoteldata)) {
-                        echo $hoteldata['price'];
                     }
                 ?>" size="50"/></td>
             </tr>

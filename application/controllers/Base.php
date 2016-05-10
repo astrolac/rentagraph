@@ -56,18 +56,31 @@ class Base extends CI_Controller {
             $data = $this->baselib->makedataarray();
 
             $data['innermenu'] = array (
-                'Добавить' => $this->config->item('base_url')."index.php/base/hotelsadd/",
-                'Изменить' => $this->config->item('base_url')."index.php/base/hotelsedit/",
-                'Удалить' => $this->config->item('base_url')."index.php/base/hotelsdel/",
-                'Вернуть' => $this->config->item('base_url')."index.php/base/hotelsrev/"
+                'Добавить' => $this->config->item('base_url')."index.php/base/hotelsadd/"
             );
 
-            /* Загрузим отели для отображения. */
-            $data['hotelsarray'] = $this->hotels_model->get_hotels(FALSE);
-
+            /*  Получим массив с данными отелей ассоциированный по uid-ам. */
+            $data['hotelsarray'] = $this->baselib->get_hotels_data(TRUE);
+            /*  Получим имена отелей для отображения. */
+            $data['hnames'] = $this->baselib->get_hnames(TRUE);
             /* Зададим заголовок для страницы. */
-            $data['title'] = 'Дома/Гостиницы';
-
+            $data['title'] = 'Отели';
+            /*  Дадим ссылки на действия изменения и удаления. */
+            $data['href'] = array (
+                'edit' => array (
+                    'text' => "Изменить",
+                    'href' => $this->config->item('base_url')."index.php/base/hotelsadd/"
+                ),
+                'block' => array (
+                    'text' => "Блокировать",
+                    'href' => $this->config->item('base_url')."index.php/base/hotelsdel/"
+                ),
+                'rev' => array (
+                    'text' => "Восстановить",
+                    'href' => $this->config->item('base_url')."index.php/base/hotelsrev/"
+                )
+            );
+            /*  Отобразим необходимые представления. */
             $this->load->view('header', $data);
             $this->load->view('mainmenu', $data);
             $this->load->view('showhotels', $data);
@@ -88,7 +101,15 @@ class Base extends CI_Controller {
                 $data['title'] = "Изменение данных об отеле";
                 $data['hoteldata'] = $this->hotels_model->get_hotels($huid);
             }
-
+          /*  Получим соответствие имен отелей их uid-ам.
+              Для этого сначала получим данные обо всех отелях, а затем
+              из этих данных сформируем массив для передачи форме. */
+            /*$data['hnames'] = array ();
+            $allhotels = $this->hotels_model->get_hotels();
+            foreach ($allhotels as $hdata) {
+                $data['hnames'][$hdata['uid']] = $hdata['hname'];
+            }*/
+            $data['hnames'] = $this->baselib->get_hnames();
           /*  Загрузим типы отелей. */
             $htypes = $this->hotels_model->get_htypes();
             $data['htypes'] = array();
@@ -123,7 +144,8 @@ class Base extends CI_Controller {
                 'percentfee' => floatval(str_replace(",",".",$this->input->post('percentfee'))),
                 'fixedfee' => floatval(str_replace(",",".",$this->input->post('fixedfee'))),
                 'price' => floatval(str_replace(",",".",$this->input->post('price'))),
-                'isactive' => 1
+                'isactive' => 1,
+                'puid' => intval($this->input->post('puid'))
             );
           /*  Проверим, не передан ли нам признак того что данные
               для редактирования отеля, а не для добавления. */
@@ -175,8 +197,7 @@ class Base extends CI_Controller {
           /*  Если uid отеля передан, значит мы уже после формы выбора отеля
               и нужно просто перевести выбранный отель в статус неактивного. */
             if($huid) {
-                $data = array('isactive' => 0);
-                $this->hotels_model->update_hotel($huid, $data);
+                $this->hotels_model->isactive_hotel($huid, 0);
               /*  Загрузим хелпер урлов для будущих редиректов. */
                 $this->load->helper('url');
               /*  Сделаем редирект на страницу отображения всех броней. */
@@ -208,28 +229,48 @@ class Base extends CI_Controller {
           /*  Если uid отеля передан, значит мы уже после формы выбора отеля
               и нужно просто перевести выбранный отель в статус активного. */
             if($huid) {
-                $data = array('isactive' => 1);
-                $this->hotels_model->update_hotel($huid, $data);
+                $this->hotels_model->isactive_hotel($huid, 1);
               /*  Загрузим хелпер урлов для будущих редиректов. */
                 $this->load->helper('url');
               /*  Сделаем редирект на страницу отображения всех броней. */
                 redirect('base/hotelsmaintain');
             } else {
-              /*  Иначе выдаем штатно страницу выбора отеля. */
+              /*  Сформируем общие данные. */
                 $data = $this->baselib->makedataarray();
                 $data['innermenu'] = array();
-              /*  Загрузим отели для отображения. Вторым парамтером передаем состочние
-                  поля isactive в таблице с отелями. */
-                $data['hotelsarray'] = $this->hotels_model->get_hotels(FALSE,0);
               /*  Сформируем заголовок для пользователя. */
-                $data['title'] = "Выберете отель для разблокировки";
-              /*  Ссылка на страницу-обработчик. */
-                $data['href'] = $this->config->item('base_url')."index.php/base/hotelsrev/";
+                $data['title'] = "Отели для разблокировки";
+              /*  Создадим массив со ссылками действия. */
+                $data['href'] = array (
+                    array (
+                        'text' => "Вернуть",
+                        'href' => $this->config->item('base_url')."index.php/base/hotelsrev/"
+                    )
+                );
+              /*  Получим массив с именами отелей. */
+                /*Нужно получить все отели (get_all_hotels).
+                Затем из всех отелей сформировать имена по следующему принуципу:
+                  1. попадает в массив, если isactive = 0
+                  2. попадает в массив, если есть дочерние у которых isactive = 0
+                остальное штатно.
+                Есть НО! При отображении действий на родительском НЕБЛОКИРОВАННОМ отеле
+                также отобразится действие восстановления и при его активации восстановятся
+                все дочерние.
+                Как вариант можно сделать блокировку родительского со всеми потомками,
+                а восстановление только каждой единицы в отдельности.*/
+
               /*  Отобразим необходимые представления. */
                 $this->load->view('header', $data);
                 $this->load->view('mainmenu', $data);
-                $this->load->view('booking_hselect', $data);
+                $this->load->view('showhotels', $data);
                 $this->load->view('footer', $data);
+
+
+
+
+              /*  Загрузим отели для отображения. Вторым парамтером передаем состочние
+                  поля isactive в таблице с отелями. */
+                $data['hotelsarray'] = $this->hotels_model->get_hotels(FALSE,0);
             }
         }
     }

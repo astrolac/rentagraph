@@ -33,13 +33,8 @@ class Booking extends CI_Controller {
             $data['title'] = "Все брони";
           /*  Получим все активные отели. */
             $allhotels = $this->hotels_model->get_hotels();
-          /*  Создадим массив наименований отелей для передачи в представление,
-              чтобы потом не мучать БД, для поиска имен, т.к. массив с бронями в качестве
-              ключей будет использовать uid отеля. */
-            $hotelsname = array();
-            foreach($allhotels as $hotelitem) {
-                $hotelsname[$hotelitem['uid']] = $hotelitem['hname'];
-            }
+          /*  Создадим массив наименований отелей для передачи в представление. */
+            $hotelsname = $this->baselib->get_hnames();
           /*  Получим период всех активных броней. */
             $period = $this->hotels_model->get_active_bookings_period();
 
@@ -56,13 +51,13 @@ class Booking extends CI_Controller {
                 массива с датами в дальнейшем. Поэтому появилось такое условие, что если дата "вчера"
                 больше даты окончания периода, то просто выводятся все брони - т.е. фактически
                 исторические данные. */
-            if($unixtime < mysql_to_unix($period[0])) {
+            if($unixtime < mysql_to_unix($period[1])) {
               /*  В начальную дату периода затолкаем полученное значение, приведенное в строку. */
                 $period[0] = date('Y-m-d', $unixtime);
             } else {
               /*  Либо опционально можно обе даты периода сделать равными "вчера". */
-                $period[0] = date('Y-m-d', $unixtime);
-                $period[1] = date('Y-m-d', $unixtime);
+                /*$period[0] = date('Y-m-d', $unixtime);
+                $period[1] = date('Y-m-d', $unixtime);*/
             }
           /*  Если входными параметрами заданы даты налача/конца периода, то подменим ими
               значения полученные перед этим. */
@@ -153,6 +148,8 @@ class Booking extends CI_Controller {
             $data['hotelsarray'] = $this->hotels_model->get_hotels(FALSE);
           /*  Сформируем заголовок для пользователя. */
             $data['title'] = "Выберете отель";
+            /*  Получим имена отелей для отображения. */
+            $data['hnames'] = $this->baselib->get_hnames();
           /*  Сформируем переменную с ссылкой которая будет на имени отеля.
             2016-04-27 Это добавлено для того, чтобы использовать это представление
               не только для этой функции, но и для тех где требуется аналогичный
@@ -282,6 +279,36 @@ class Booking extends CI_Controller {
                                                       $bookinginfo['datein'],
                                                       $bookinginfo['dateout'],
                                                       $buid);
+            $this->load->helper('date');
+            if(mysql_to_unix($bookinginfo['dateout']) < mysql_to_unix($bookinginfo['datein'])) {
+              /*  Если дата выезда раньше чем дата заезда. */
+              /*  Сначала подготовим массив для формы. Чтобы при повторном
+                  отображении формы введенные данные были сохранены. */
+                unset($bookinginfo['userlogin']);
+                unset($bookinginfo['isactive']);
+                $bookinginfo['datein'] = $this->input->post('datein');
+                $bookinginfo['dateout'] = $this->input->post('dateout');
+                $bookinginfo['beforepaydate'] = $this->input->post('beforepaydate');
+
+              /*  Теперь сформируем сам массив для отображения ошибки. */
+                $errorinfo = array (
+                    'etext' => 'Дата заезда раньше даты выезда!',
+                    'forminfo' => $bookinginfo,
+                    'blob' => NULL
+                );
+              /*  Запомним эти данные в сессии. */
+                $_SESSION['errorinfo'] = $errorinfo;
+              /*  Если это редактирование то надо сообщить об этом или об обратном. */
+                if($isedit == "YES") {
+                    $_SESSION['errorinfo']['isedit'] = "YES";
+                  /*  Добавим информацию о номере брони. */
+                    $_SESSION['errorinfo']['forminfo']['uid'] = $buid;
+                } else {
+                    $_SESSION['errorinfo']['isedit'] = "NO";
+                }
+              /*  И сделаем редирект. */
+                redirect('booking/booking_add_form/'.$bookinginfo['huid']);
+            }
             if (count($res) == 0) {
               /*  Если никаких броней пересекающейся с нашей нет, то
                   добавим данные в БД, или проапдейтим текущую запись. */
@@ -303,12 +330,6 @@ class Booking extends CI_Controller {
                   отображении формы введенные данные были сохранены. */
                 unset($bookinginfo['userlogin']);
                 unset($bookinginfo['isactive']);
-                /*$datein = $this->input->post('datein');
-                $bookinginfo['datein'] = substr($datein, -2)."-".substr($datein, 5, 2)."-".substr($datein, 0, 4);
-                $dateout = $this->input->post('dateout');
-                $bookinginfo['dateout'] = substr($dateout, -2)."-".substr($dateout, 5, 2)."-".substr($dateout, 0, 4);
-                $beforepaydate = $this->input->post('beforepaydate');
-                $bookinginfo['beforepaydate'] = substr($beforepaydate, -2)."-".substr($beforepaydate, 5, 2)."-".substr($beforepaydate, 0, 4);*/
                 $bookinginfo['datein'] = $this->input->post('datein');
                 $bookinginfo['dateout'] = $this->input->post('dateout');
                 $bookinginfo['beforepaydate'] = $this->input->post('beforepaydate');
@@ -317,7 +338,7 @@ class Booking extends CI_Controller {
                 $errorinfo = array (
                     'etext' => 'Бронь пересекается с одной из существующих!',
                     'forminfo' => $bookinginfo,
-                    'blob' => $res,
+                    'blob' => $res
                 );
               /*  Запомним эти данные в сессии. */
                 $_SESSION['errorinfo'] = $errorinfo;

@@ -13,15 +13,35 @@ class Hotels_model extends CI_Model {
         Функция возвращает все отели из таблицы, если не задан никакой uid, или
         только строку по заданному uid.
     */
-    public function get_hotels($hotelid = FALSE, $isactive = 1)
+    public function get_hotels($hotelid = FALSE, $isactive = 1/*, $puid = 0*/)
     {
         if ($hotelid === FALSE) {
-            $query = $this->db->get_where('hotels', array('isactive' => $isactive));
+            //$querystr = "SELECT * FROM hotels WHERE isactive=".$isactive." AND puid=".$puid." ORDER BY hname";
+            $querystr = "SELECT * FROM hotels WHERE isactive=".$isactive." ORDER BY hname";
+            $query = $this->db->query($querystr);
             return $query->result_array();
         }
 
         $query = $this->db->get_where('hotels', array('uid' => $hotelid, 'isactive' => $isactive));
         return $query->row_array();
+    }
+
+    public function get_allall_hotels() {
+        $querystr = "SELECT * FROM hotels ORDER BY hname";
+        $query = $this->db->query($querystr);
+        return $query->result_array();
+    }
+
+    public function get_chotels($hotelid, $puid, $isactive = 1)
+    {
+        $query = $this->db->get_where('hotels', array('uid' => $hotelid, 'puid' => $puid, 'isactive' => $isactive));
+        return $query->row_array();
+    }
+
+    public function get_all_hotels() {
+        $querystr = "SELECT * FROM hotels;";
+        $query = $this->db->query($querystr);
+        return $query->result_array();
     }
 
     /*
@@ -50,6 +70,14 @@ class Hotels_model extends CI_Model {
         $querystr .= " WHERE uid=".$huid.";";
 
         $query = $this->db->query($querystr);
+    }
+
+    public function isactive_hotel($huid, $isactive) {
+        $stages = array ('uid', 'puid');
+        foreach ($stages as $field) {
+            $querystr = "UPDATE hotels SET isactive=".$isactive." WHERE ".$field."=".$huid;
+            $query = $this->db->query($querystr);
+        }
     }
 
     /*
@@ -81,7 +109,8 @@ class Hotels_model extends CI_Model {
         Диапазон дат ограничен 01-01-1900 и 31-12-2100, думаю хватит ... или нет ... ?
     */
     public function get_bookings($huid, $datein = FALSE, $dateout = FALSE, $buid = FALSE) {
-        $querystr = "SELECT uid,datein,dateout,person,personphone,totalsum,beforepaysum,beforepaydate,comments,byowner,userlogin,bookingtimestamp from bookings WHERE huid=".$huid." AND isactive=1" ;
+        $querystr = "SELECT * from bookings WHERE huid=".$huid." AND isactive=1" ;
+        /* uid,datein,dateout,person,personphone,totalsum,beforepaysum,beforepaydate,comments,byowner,userlogin,bookingtimestamp */
         if ($datein) {
             $querystr .=" AND dateout>'".$datein."'";
         }
