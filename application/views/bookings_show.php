@@ -58,14 +58,14 @@
           <?php foreach ($hotelsname as $huid => $hnamedata) { ?>
           <tr>
               <?php if(count($hnamedata['chotels']) == 0) { ?>
-                  <td style="width: 170px;" colspan="2">
+                  <td style="min-width: 170px;" colspan="2">
                       <a href="<?php
                           echo $this->config->item('base_url')."index.php/booking/bookings_by_hotel/".$huid;
                           ?>"><?php echo $hnamedata['hname']; ?></a>
                   </td>
                   <?php showhdata($huid, $datesarray, $finish);
                   } else { ?>
-                    <td style="width: 170px;" colspan="2">
+                    <td style="min-width: 170px;" colspan="2">
                         <b><?php echo $hnamedata['hname']; ?></b>
                         <button id="<?php echo $huid; ?>"></button>
                     </td>
