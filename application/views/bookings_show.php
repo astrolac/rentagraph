@@ -1,8 +1,14 @@
 <div class="innermenu">
+    <?php $this->load->helper('url'); ?>
+    <script src="<?php echo base_url(); ?>noCI_lib/datepicker/tcal.js" type="text/javascript"></script>
+    <form id="period" action="<?php echo base_url(); ?>index.php/booking/bookings_by_period" method="post">
+        <input type="text" name="datestart" class="tcal icalInput" value="<?php echo $period['datestart']; ?>" />
+        <input type="text" name="dateend" class="tcal icalInput" value="<?php echo $period['dateend']; ?>" />
+        <button class="innermenubutton" type="submit" form="period">Отобразить за период</button>
+    </form>
     <?php
-    echo "| ";
     foreach ($innermenu as $key => $value) {
-        echo "<a href=\"".$value."\">".$key."</a> | ";
+        echo "<a href=\"".$value."\"><button class=\"innermenubutton\">".$key."</button></a> ";
     }
     ?>
 </div>

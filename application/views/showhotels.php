@@ -1,8 +1,7 @@
 <div class="innermenu">
     <?php
-    echo "| ";
     foreach ($innermenu as $key => $value) {
-        echo "<a href=\"".$value."\">".$key."</a> | ";
+        echo "<a href=\"".$value."\"><button class=\"innermenubutton\">".$key."</button></a> ";
     }
     ?>
 </div>

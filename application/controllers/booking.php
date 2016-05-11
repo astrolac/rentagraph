@@ -24,10 +24,8 @@ class Booking extends CI_Controller {
             $data = $this->baselib->makedataarray();
           /*  Сформируем массив с внутренним меню представления. */
             $data['innermenu'] = array (
-                'Отобразить период'  => $this->config->item('base_url')."index.php/booking/booking_show_period/",
                 'Добавить бронь' => $this->config->item('base_url')."index.php/booking/booking_add/",
                 'Снять бронь' => $this->config->item('base_url')."index.php/booking/booking_cancel/",
-
             );
           /*  Сформируем заголовок для пользователя. */
             $data['title'] = "Все брони";
@@ -67,6 +65,8 @@ class Booking extends CI_Controller {
             if($dateend) {
                 $period[1] = $dateend;
             }
+            $data['period']['datestart'] = substr($period[0], -2)."-".substr($period[0], 5, 2)."-".substr($period[0], 0, 4);
+            $data['period']['dateend'] = substr($period[1], -2)."-".substr($period[1], 5, 2)."-".substr($period[1], 0, 4);
           /*  Загрузим хелпер дат. */
             $this->load->helper('date');
           /*  Получим массив дат периода.
@@ -133,6 +133,11 @@ class Booking extends CI_Controller {
         }
     }
 
+    /*'Отобразить период'  => $this->config->item('base_url')."index.php/booking/booking_by_period/",*/
+    public function bookings_by_period() {
+        $this->bookings($this->dateconvert($this->input->post('datestart')), $this->dateconvert($this->input->post('dateend')));
+    }
+
     /*
          Функция добавления брони.
     */
@@ -148,8 +153,22 @@ class Booking extends CI_Controller {
             $data['hotelsarray'] = $this->hotels_model->get_hotels(FALSE);
           /*  Сформируем заголовок для пользователя. */
             $data['title'] = "Выберете отель";
-            /*  Получим имена отелей для отображения. */
+          /*  Получим имена отелей для отображения. */
             $data['hnames'] = $this->baselib->get_hnames();
+/*
+            $hdata = $this->baselib->get_hotels_data();
+            $data['hdata'] = array ();
+            foreach($hdata as $hrow) {
+                $bookingsdata = $this->hotels_model->get_bookings($hrow['uid']);
+                $bstr = "";
+                foreach($bookingsdata as $brow) {
+                    echo "[c ".$brow['datein']." по ".$brow['dateout']."]";
+                    $bstr += "[c ".$brow['datein']." по ".$brow['dateout']."]";
+                }
+                  echo $bstr;
+                $data['hdata'][$hrow['uid']] = $bstr;
+            }*/
+
           /*  Сформируем переменную с ссылкой которая будет на имени отеля.
             2016-04-27 Это добавлено для того, чтобы использовать это представление
               не только для этой функции, но и для тех где требуется аналогичный
