@@ -16,7 +16,7 @@
   <table class="bookings">
       <thead>
         <tr>
-          <td style="width: 170px;" colspan="2">Наименование отеля</td>
+          <td style="width: 250px;" colspan="2">Наименование отеля</td>
           <?php foreach ($datesarray as $dateitem) { ?>
                 <td style="min-width: 40px; height: 40px;"><?php
                     echo "<u>".substr($dateitem, -2)."/".substr($dateitem, 5, 2)."</u><br />".substr($dateitem, 0, 4);
@@ -64,14 +64,14 @@
           <?php foreach ($hotelsname as $huid => $hnamedata) { ?>
           <tr>
               <?php if(count($hnamedata['chotels']) == 0) { ?>
-                  <td style="min-width: 170px;" colspan="2">
+                  <td style="min-width: 250px;" colspan="2">
                       <a href="<?php
                           echo $this->config->item('base_url')."index.php/booking/bookings_by_hotel/".$huid;
                           ?>"><?php echo $hnamedata['hname']; ?></a>
                   </td>
                   <?php showhdata($huid, $datesarray, $finish);
                   } else { ?>
-                    <td style="min-width: 170px;" colspan="2">
+                    <td style="min-width: 230px;" colspan="2">
                         <b><?php echo $hnamedata['hname']; ?></b>
                         <button id="<?php echo $huid; ?>"></button>
                     </td>
@@ -81,7 +81,7 @@
                   foreach ($hnamedata['chotels'] as $chuid => $chnamedata) { ?>
                     <tr name=<?php echo $huid; ?>>
                         <td style="width: 20px;"></td>
-                        <td style="width: 150px;">
+                        <td style="width: 230px;">
                             <a href="<?php
                                 echo $this->config->item('base_url')."index.php/booking/bookings_by_hotel/".$chuid;
                                 ?>"><?php echo $chnamedata; ?></a>
