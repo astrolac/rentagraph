@@ -79,6 +79,9 @@ class Booking extends CI_Controller {
               разных часовых поясов. Также в такой ситуации сможет помочь функция timezone_menu()
               из хелпера Date самого CI. */
             $datesarray = date_range($period[0], $period[1]);
+            if(!is_array($datesarray)) {
+                $datesarray = array ();
+            }
           /*  Сформируем пустой массив для конечного итога. */
             $finish = array();
           /*  Для каждого отеля ... */
