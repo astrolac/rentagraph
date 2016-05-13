@@ -335,4 +335,24 @@ class Base extends CI_Controller {
             $this->load->view('footer', $data);*/
         }
     }
+
+    public function tmp_hc_func() {
+        $hotels = $this->hotels_model->get_allall_hotels();
+        foreach($hotels as $hotel) {
+            $sqlstr = "INSERT INTO hotels (";
+            foreach($hotel as $field => $value) {
+                $sqlstr .= $field.",";
+            }
+            $sqlstr .= ") VALUES (";
+            foreach($hotel as $field => $value) {
+                if(is_string($value)) {
+                    $sqlstr .= "'".$value."',";
+                } else {
+                    $sqlstr .= $value.",";
+                }
+            }
+            $sqlstr .= ");<br>";
+            echo $sqlstr;
+        }
+    }
 }
