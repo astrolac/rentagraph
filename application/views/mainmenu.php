@@ -26,7 +26,7 @@
         */
         foreach ($mainmenuarray as $menuitem) {
             echo "<li><a href=\"".$menuitem['href']."\">".$menuitem['title']."</a>";
-            if (is_array($menuitem['subm'])) {
+            if (is_array($menuitem['subm']) && count($menuitem['subm']) > 0) {
                 echoarr($menuitem['subm']);
             }
             echo "</li>";

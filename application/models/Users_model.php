@@ -35,4 +35,18 @@ class Users_model extends CI_Model {
         $querystr = "UPDATE users SET isactive=1 WHERE login LIKE '".$login."';";
         $query = $this->db->query($querystr);
     }
+
+  /*
+      Возвращает пунты меню по заданному родительскому uid, либо просто все записи таблицы.
+  */
+    public function get_menu($puid = FALSE) {
+        if($puid !== FALSE) {
+            $querystr = "SELECT * FROM menu WHERE puid=".$puid.";";
+            $query = $this->db->query($querystr);
+        } else {
+            $querystr = "SELECT * FROM menu;";
+            $query = $this->db->query($querystr);
+        }
+        return $query->result_array();
+    }
 }

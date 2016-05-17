@@ -21,62 +21,44 @@ class Baselib {
     }
 
     /*
-        Функция формирования массива для построения меню пользователя (согласно
-        роли).
+        Функция формирования массива для построения меню пользователя.
         Возвращаемый массив содержит пункты меню. Каждый пункт меню - массив.
         Массивы могут быть вложенными, если являются пунктами подменю.
         Вложенность не ограничена.
     */
+    public function makePureMenuArray($puid) {
+      /*  Получаем из БД все пункты меню с заданным puid. */
+        $menufromDB = $this->CI->Users_model->get_menu($puid);
+      /*  Создадим пустой массив. */
+        $resmenu = array ();
+      /*  Теперь пройдемся по нему. */
+        foreach($menufromDB as $menuitem) {
+          /*  Для каждого пункта меню создадим ассоциативный массив. */
+            $resinmenu = array ();
+          /*  Затолкаем в него данные из записи о пункте меню. */
+            $resinmenu['uid'] = $menuitem['uid'];
+            $resinmenu['title'] = $menuitem['title'];
+            $resinmenu['href'] = $menuitem['href'];
+          /*  Для подменю рекурсивно запустим эту же функцию передав в качестве родительского
+              uid свой собственный. */
+            $resinmenu['subm'] = $this->makeSubMenuArray($menuitem['uid']);
+          /*  В результирующий массив затолкаем созданный элемент. */
+            $resmenu[] = $resinmenu;
+        }
+        return $resmenu;
+        /*  Стуртура массива меню:
+          arrayitem:
+              'uid' => uid пункта меню
+              'title' => заголовок пункта меню
+              'href' => URI пункта меню
+              'sumb' => массив подменю этого пункта меню (по структуре повторяет родительский элемент)
+                  и т.д. вложенность не ограничена
+        */
+    }
+
     public function makeMenuArray($roleid) {
-        $menuArray = array (
-            array(
-                'title' =>  'Бронирование',
-                'href'  =>  $this->CI->config->item('base_url')."index.php/booking/bookings",
-                'subm'  =>  array (
-                              array (
-                                'title' =>  'Забронировать',
-                                'href'  =>  $this->CI->config->item('base_url')."index.php/booking/booking_add",
-                                'subm'  =>  ''
-                              ),
-                              array (
-                                'title' =>  'Снять бронь',
-                                'href'  =>  $this->CI->config->item('base_url')."index.php/booking/booking_cancel",
-                                'subm'  =>  ''
-                              )
-                            )
-            ),
-            array(
-                'title' =>  'Справочники',
-                'href'  =>  '#',
-                'subm'  =>  array (
-                              array (
-                                'title' =>  'Отели',
-                                'href'  =>  $this->CI->config->item('base_url')."index.php/base/hotelsmaintain",
-                                'subm'  =>  ''
-                              ),
-                              array (
-                                'title' =>  'Типы отелей',
-                                'href'  =>  $this->CI->config->item('base_url')."index.php/base/htypes",
-                                'subm'  =>  ''
-                              ),
-                              array (
-                                'title' =>  'Пользователи',
-                                'href'  =>  $this->CI->config->item('base_url')."index.php/authoz/usersmaintain",
-                                'subm'  =>  ''
-                              ),
-                              array (
-                                'title' =>  'Роли',
-                                'href'  =>  $this->CI->config->item('base_url')."index.php/authoz/rolesmaintain",
-                                'subm'  =>  ''
-                              )
-                            )
-            ),
-            array(
-                'title' =>  'Справка',
-                'href'  =>  $this->CI->config->item('base_url')."index.php/base/helpium",
-                'subm'  =>  ''
-            )
-        );
+
+        $menuArray = $this->makePureMenuArray(0);
 
         return $menuArray;
     }
