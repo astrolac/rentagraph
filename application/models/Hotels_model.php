@@ -125,6 +125,12 @@ class Hotels_model extends CI_Model {
         return $query->result_array();
     }
 
+    public function get_allall_bookings() {
+        $querystr = "SELECT * from bookings;";
+        $query = $this->db->query($querystr);
+        return $query->result_array();
+    }
+
     /*
         Функция добавляет в БД бронь для отеля.
     */
