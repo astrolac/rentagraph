@@ -43,8 +43,12 @@
                       echo "<td>".$row['userlogin']."</td>";
                       echo "<td>".$row['bookingtimestamp']."</td>";
                       echo "<td>";
-                      echo "[<a href=\"$hrefedit".$row['uid']."\">Изменить</a>]";
-                      echo "[<a href=\"$hrefcancel".$row['uid']."\">Снять</a>]";
+                      /*  Здесь проверяем вариант что пользователю разрешено редактировать только свои брони
+                          и тогда только для его броней отображаем действия. */
+                      if(($_SESSION['role']['ownbonly'] && $row['userlogin'] == $_SESSION['login']) || !$_SESSION['role']['ownbonly']) {
+                          echo "[<a href=\"$hrefedit".$row['uid']."\">Изменить</a>]";
+                          echo "[<a href=\"$hrefcancel".$row['uid']."\">Снять</a>]";
+                      }
                       echo "</td>";
                   echo "</tr>";
               }

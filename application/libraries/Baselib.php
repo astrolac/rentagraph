@@ -26,9 +26,9 @@ class Baselib {
         Массивы могут быть вложенными, если являются пунктами подменю.
         Вложенность не ограничена.
     */
-    public function makePureMenuArray($puid) {
+    public function makePureMenuArray($roleid, $puid) {
       /*  Получаем из БД все пункты меню с заданным puid. */
-        $menufromDB = $this->CI->Users_model->get_menu($puid);
+        $menufromDB = $this->CI->Users_model->get_user_menu($roleid, $puid);
       /*  Создадим пустой массив. */
         $resmenu = array ();
       /*  Теперь пройдемся по нему. */
@@ -38,10 +38,10 @@ class Baselib {
           /*  Затолкаем в него данные из записи о пункте меню. */
             $resinmenu['uid'] = $menuitem['uid'];
             $resinmenu['title'] = $menuitem['title'];
-            $resinmenu['href'] = $menuitem['href'];
+            $resinmenu['href'] = $this->CI->config->item('base_url').$menuitem['href'];
           /*  Для подменю рекурсивно запустим эту же функцию передав в качестве родительского
               uid свой собственный. */
-            $resinmenu['subm'] = $this->makeSubMenuArray($menuitem['uid']);
+            $resinmenu['subm'] = $this->makePureMenuArray($roleid, $menuitem['uid']);
           /*  В результирующий массив затолкаем созданный элемент. */
             $resmenu[] = $resinmenu;
         }
@@ -50,16 +50,14 @@ class Baselib {
           arrayitem:
               'uid' => uid пункта меню
               'title' => заголовок пункта меню
-              'href' => URI пункта меню
+              'href' => URL пункта меню
               'sumb' => массив подменю этого пункта меню (по структуре повторяет родительский элемент)
                   и т.д. вложенность не ограничена
         */
     }
 
     public function makeMenuArray($roleid) {
-
-        $menuArray = $this->makePureMenuArray(0);
-
+        $menuArray = $this->makePureMenuArray($roleid, 0);
         return $menuArray;
     }
 
@@ -76,7 +74,9 @@ class Baselib {
         $data['righthref'] = $this->CI->config->item('base_url')."index.php/Authoz/auth_end/";
         $data['righthreftext'] = 'Выход';
 
-        $data['mainmenuarray'] = $this->makeMenuArray($_SESSION['roleid']);
+        $data['mainmenuarray'] = $_SESSION['mainmenuarray'];
+
+        $data['innermenu'] = array ();
 
         return $data;
     }
@@ -87,7 +87,7 @@ class Baselib {
             $allhotels = $this->CI->hotels_model->get_allall_hotels();
         } else {
           /* Загрузим отели для отображения. */
-            $allhotels = $this->CI->hotels_model->get_hotels(FALSE);
+            $allhotels = $this->CI->hotels_model->get_hotels(FALSE, 1);
         }
       /*  Создадим массив наименований отелей для передачи в представление. */
         $hotelsname = array ();
@@ -134,7 +134,7 @@ class Baselib {
                 $allhotels = $this->CI->hotels_model->get_allall_hotels();
             } else {
               /* Загрузим отели для отображения. */
-                $allhotels = $this->CI->hotels_model->get_hotels(FALSE);
+                $allhotels = $this->CI->hotels_model->get_hotels(FALSE, 1);
             }
         $hotelsarray = array ();
         foreach($allhotels as $hotelitem) {
@@ -143,5 +143,14 @@ class Baselib {
             }
         }
         return $hotelsarray;
+    }
+
+    public function is_hotel_in_my_scope($huid) {
+        $hotels = $this->CI->hotels_model->get_hotels($huid, FALSE);
+        if(count($hotels) > 0) {
+            return TRUE;
+        } else {
+            return FALSE;
+        }
     }
 }

@@ -49,8 +49,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | Examples:	my-controller/index	-> my_controller/index
 |		my-controller/my-method	-> my_controller/my_method
 */
-/*$route['default_controller'] = 'welcome';*/
-$route['404_override'] = '';
+/*$route['default_controller'] = 'welcome';
+$route['404_override'] = '';*/
 $route['translate_uri_dashes'] = FALSE;
 
 $route['booking/bookings'] = 'booking/bookings';
@@ -62,8 +62,21 @@ $route['booking/bookings_show'] = 'booking/bookings_show';
 $route['base/hotelsadd_job'] = 'base/hotelsadd_job';
 $route['base/hotelsadd'] = 'base/hotelsadd';
 $route['base/hotelsmaintain'] = 'base/hotelsmaintain';
+
 $route['authoz/auth_test'] = 'authoz/auth_test';
+
 $route['authoz/usersmaintain'] = 'authoz/usersmaintain';
+$route['authoz/user_add'] = 'authoz/user_add';
+$route['authoz/user_add_job'] = 'authoz/user_add_job';
+
+$route['authoz/scopesmaintain'] = 'authoz/scopesmaintain';
+$route['authoz/scope_edit'] = 'authoz/scope_edit';
+$route['authoz/scope_edit_job'] = 'authoz/scope_edit_job';
+
+$route['authoz/rolesmaintain'] = 'authoz/rolesmaintain';
+$route['authoz/role_add'] = 'authoz/role_add';
+$route['authoz/role_add_job'] = 'authoz/role_add_job';
+
 $route['authoz/(:any)'] = 'authoz/authz/$1';
 /*$route['authoz/authz'] = 'authoz/authz';*/
 $route['authoz'] = 'authoz';

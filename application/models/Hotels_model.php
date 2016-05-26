@@ -12,37 +12,55 @@ class Hotels_model extends CI_Model {
     /*
         Функция возвращает все отели из таблицы, если не задан никакой uid, или
         только строку по заданному uid.
+        2016-05-25 Теперь возвращаются только те отели, которые попадают в область видимости.
     */
-    public function get_hotels($hotelid = FALSE, $isactive = 1/*, $puid = 0*/)
+    public function get_hotels($hotelid = FALSE, $isactive = FALSE/*, $puid = 0*/)
     {
         if ($hotelid === FALSE) {
             //$querystr = "SELECT * FROM hotels WHERE isactive=".$isactive." AND puid=".$puid." ORDER BY hname";
-            $querystr = "SELECT * FROM hotels WHERE isactive=".$isactive." ORDER BY hname";
+            $querystr = "SELECT * FROM hotels WHERE";
+            $querystr .= " uid IN (SELECT hotel FROM scopesfill WHERE scope=".$_SESSION['scope'].")";
+            if($isactive !== FALSE) {
+                $querystr .= " AND isactive=".$isactive;
+            }
+            $querystr .= " ORDER BY hname;";
             $query = $this->db->query($querystr);
             return $query->result_array();
         }
 
-        $query = $this->db->get_where('hotels', array('uid' => $hotelid, 'isactive' => $isactive));
-        return $query->row_array();
+        $querystr = "SELECT * FROM hotels WHERE";
+        $querystr .= " uid IN (SELECT hotel FROM scopesfill WHERE scope=".$_SESSION['scope'].")";
+        if($isactive !== FALSE) {
+            $querystr .= " AND isactive=".$isactive;
+        }
+        $querystr .= " AND uid=".$hotelid.";";
+        $query = $this->db->query($querystr);
+        $query = $query->result_array();
+        return $query[0];
     }
-
+    /*  Получает все отели независимо от isactive и т.д. */
     public function get_allall_hotels() {
         $querystr = "SELECT * FROM hotels ORDER BY hname";
         $query = $this->db->query($querystr);
         return $query->result_array();
     }
-
-    public function get_chotels($hotelid, $puid, $isactive = 1)
+    /*  Получает дочерние отели по uid родителя. */
+    public function get_chotels($puid, $isactive = FALSE)
     {
-        $query = $this->db->get_where('hotels', array('uid' => $hotelid, 'puid' => $puid, 'isactive' => $isactive));
-        return $query->row_array();
+          $querystr = "SELECT * FROM hotels WHERE puid=".$puid;
+          if($isactive !== FALSE) {
+              $querystr .= " AND isactive=".$isactive;
+          }
+          $querystr .= ";";
+          $query = $this->db->query($querystr);
+          return $query->result_array();
     }
 
-    public function get_all_hotels() {
+    /*public function get_all_hotels() {
         $querystr = "SELECT * FROM hotels;";
         $query = $this->db->query($querystr);
         return $query->result_array();
-    }
+    }*/
 
     /*
         Функция добавляет отель в БД.
@@ -120,7 +138,7 @@ class Hotels_model extends CI_Model {
         if ($buid) {
             $querystr .=" AND uid<>".$buid;
         }
-        $querystr .=" ORDER BY datein;";
+        $querystr .=" ORDER BY datein DESC;";
         $query = $this->db->query($querystr);
         return $query->result_array();
     }
@@ -208,5 +226,4 @@ class Hotels_model extends CI_Model {
 
         return array($periodstart, $periodend);
     }
-
 }

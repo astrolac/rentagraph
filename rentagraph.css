@@ -130,6 +130,10 @@ td.numeric {
   margin: 0;
   padding: 2px 5px;
 }
+
+td.sign {
+  text-align: center;
+}
 /*
 ==================================================================
 */

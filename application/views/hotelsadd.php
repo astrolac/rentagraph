@@ -44,6 +44,7 @@
                         ?>><?php echo $value; ?></option>
                         <?php } ?>
                     </select>
+                </td>
             </tr>
 
             <tr>

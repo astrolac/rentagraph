@@ -29,6 +29,11 @@ class Base extends CI_Controller {
 
             $this->load->view('header', $data);
             $this->load->view('mainmenu', $data);
+
+            /*echo '<pre>';
+            print_r( $_SESSION );
+            echo '<pre>';*/
+
             $this->load->view('footer', $data);
         /*
             Если не залогинен, формируем данныые для формы сообщения о
@@ -52,7 +57,7 @@ class Base extends CI_Controller {
         и меню функционала по их добавлению/удалению/редактированию.
     */
     public function hotelsmaintain() {
-        if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE) {
+        if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE && $_SESSION['role']['hcontrol']) {
             $data = $this->baselib->makedataarray();
 
             $data['innermenu'] = array (
@@ -60,9 +65,9 @@ class Base extends CI_Controller {
             );
 
             /*  Получим массив с данными отелей ассоциированный по uid-ам. */
-            $data['hotelsarray'] = $this->baselib->get_hotels_data(TRUE);
+            $data['hotelsarray'] = $this->baselib->get_hotels_data(/*TRUE*/);
             /*  Получим имена отелей для отображения. */
-            $data['hnames'] = $this->baselib->get_hnames(TRUE);
+            $data['hnames'] = $this->baselib->get_hnames(/*TRUE*/);
             /* Зададим заголовок для страницы. */
             $data['title'] = 'Отели';
             /*  Дадим ссылки на действия изменения и удаления. */
@@ -92,14 +97,14 @@ class Base extends CI_Controller {
         Функция выводит форму для добавления отеля.
     */
     public function hotelsadd($huid = FALSE) {
-        if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE) {
+        if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE && $_SESSION['role']['hcontrol']) {
             $data = $this->baselib->makedataarray();
 
             if($huid == FALSE) {
                 $data['title'] = "Добавить отель";
-            } else {
+            } elseif($this->baselib->is_hotel_in_my_scope($huid)) {
                 $data['title'] = "Изменение данных об отеле";
-                $data['hoteldata'] = $this->hotels_model->get_hotels($huid);
+                $data['hoteldata'] = $this->hotels_model->get_hotels($huid, 1);
             }
           /*  Получим соответствие имен отелей их uid-ам.
               Для этого сначала получим данные обо всех отелях, а затем
@@ -132,7 +137,7 @@ class Base extends CI_Controller {
         Если передан признак редактирования, то данные об отеле обновляют существующие.
     */
     public function hotelsadd_job() {
-        if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE) {
+        if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE && $_SESSION['role']['hcontrol']) {
           /*  Сформируме массив с переданными данными. */
             $data = array(
                 'hname' => $this->input->post('hname'),
@@ -153,7 +158,9 @@ class Base extends CI_Controller {
               /*  Если признак есть, то дополнительно извлекаем uid отеля и запускаем
                   функцию апдейта отеля в модели. */
                 $huid = intval($this->input->post('huid'));
-                $this->hotels_model->update_hotel($huid, $data);
+                if($this->baselib->is_hotel_in_my_scope($huid)) {
+                    $this->hotels_model->update_hotel($huid, $data);
+                }
             } else {
               /*  Иначе запускаем функцию добавления записи об отеле. */
                 $this->hotels_model->insert_hotel($data);
@@ -169,11 +176,11 @@ class Base extends CI_Controller {
         Функция редактирования отеля.
     */
     public function hotelsedit() {
-        if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE) {
+        if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE && $_SESSION['role']['hcontrol']) {
             $data = $this->baselib->makedataarray();
             $data['innermenu'] = array();
           /*  Загрузим отели для отображения. */
-            $data['hotelsarray'] = $this->hotels_model->get_hotels(FALSE);
+            $data['hotelsarray'] = $this->hotels_model->get_hotels(FALSE, 1);
           /*  Сформируем заголовок для пользователя. */
             $data['title'] = "Выберете отель";
           /*  Сформируем переменную с ссылкой которая будет на имени отеля.
@@ -193,10 +200,10 @@ class Base extends CI_Controller {
         Функция блокировки отеля.
     */
     public function hotelsdel($huid = FALSE) {
-        if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE) {
+        if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE && $_SESSION['role']['hcontrol']) {
           /*  Если uid отеля передан, значит мы уже после формы выбора отеля
               и нужно просто перевести выбранный отель в статус неактивного. */
-            if($huid) {
+            if($huid && $this->baselib->is_hotel_in_my_scope($huid)) {
                 $this->hotels_model->isactive_hotel($huid, 0);
               /*  Загрузим хелпер урлов для будущих редиректов. */
                 $this->load->helper('url');
@@ -207,7 +214,7 @@ class Base extends CI_Controller {
                 $data = $this->baselib->makedataarray();
                 $data['innermenu'] = array();
               /*  Загрузим отели для отображения. */
-                $data['hotelsarray'] = $this->hotels_model->get_hotels(FALSE);
+                $data['hotelsarray'] = $this->hotels_model->get_hotels(FALSE, 1);
               /*  Сформируем заголовок для пользователя. */
                 $data['title'] = "Выберете отель для блокировки";
               /*  Ссылка на страницу-обработчик. */
@@ -225,10 +232,10 @@ class Base extends CI_Controller {
         Функция разблокировки отеля.
     */
     public function hotelsrev($huid = FALSE) {
-        if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE) {
+        if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE && $_SESSION['role']['hcontrol']) {
           /*  Если uid отеля передан, значит мы уже после формы выбора отеля
               и нужно просто перевести выбранный отель в статус активного. */
-            if($huid) {
+            if($huid && $this->baselib->is_hotel_in_my_scope($huid)) {
                 $this->hotels_model->isactive_hotel($huid, 1);
               /*  Загрузим хелпер урлов для будущих редиректов. */
                 $this->load->helper('url');
@@ -249,7 +256,7 @@ class Base extends CI_Controller {
                 );
               /*  Получим массив с именами отелей. */
                 /*Нужно получить все отели (get_all_hotels).
-                Затем из всех отелей сформировать имена по следующему принуципу:
+                Затем из всех отелей сформировать имена по следующему принципу:
                   1. попадает в массив, если isactive = 0
                   2. попадает в массив, если есть дочерние у которых isactive = 0
                 остальное штатно.
@@ -265,12 +272,9 @@ class Base extends CI_Controller {
                 $this->load->view('showhotels', $data);
                 $this->load->view('footer', $data);
 
-
-
-
-              /*  Загрузим отели для отображения. Вторым парамтером передаем состочние
+              /*  Загрузим отели для отображения. Вторым парамтером передаем состояние
                   поля isactive в таблице с отелями. */
-                $data['hotelsarray'] = $this->hotels_model->get_hotels(FALSE,0);
+                /*$data['hotelsarray'] = $this->hotels_model->get_hotels(FALSE,0);*/
             }
         }
     }
@@ -279,7 +283,7 @@ class Base extends CI_Controller {
         Функция отображения/добавления/удаления типов отелей.
     */
     public function htypes($htuid = FALSE) {
-        if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE) {
+        if(isset($_SESSION['logon']) && $_SESSION['logon'] == TRUE && $_SESSION['role']['hcontrol']) {
             $data = $this->baselib->makedataarray();
           /*  Если нам передали htuid то значит нажата кнопка удаления типа отеля.
               Т.о. просто удаляем соответствующий тип отеля.
