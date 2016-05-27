@@ -119,7 +119,9 @@
                                 if($forminfo['byowner'] == 'on') {
                                     echo "checked";
                                 }
-                            } ?> />
+                            } elseif($_SESSION['role']['ownbonly']) {
+                                echo "checked";
+                            }?> />
             </td>
         </tr>
 

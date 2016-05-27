@@ -16,11 +16,11 @@
   <table class="bookings">
       <thead>
         <tr>
-          <td style="width: 250px;" colspan="2">Наименование отеля</td>
+          <th style="width: 250px;" colspan="2">Наименование отеля</th>
           <?php foreach ($datesarray as $dateitem) { ?>
-                <td style="min-width: 40px; height: 40px;"><?php
+                <th style="min-width: 40px; height: 40px;"><?php
                     echo "<u>".substr($dateitem, -2)."/".substr($dateitem, 5, 2)."</u><br />".substr($dateitem, 0, 4);
-                ?></td>
+                ?></th>
           <?php } ?>
         </tr>
       </thead>

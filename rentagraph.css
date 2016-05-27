@@ -1,4 +1,5 @@
 @import "noCI_lib/datepicker/tcal.css";
+@import "tables.css";
 
 #header {
   font-family: Calibri, Helvetica, Verdana, Arial;
@@ -108,6 +109,16 @@ table.bookings {
 table.hotels tbody tr {
   background: #e0e0e0;
 }
+
+/*table.hotels,table.bookings th {
+  text-align: center;
+  font-weight: bold;
+  border: 1px solid black;
+  margin: 0;
+  padding: 2px 5px;
+  background-color: #2f8be8;
+  color: white;
+}*/
 
 thead {
   text-align: center;

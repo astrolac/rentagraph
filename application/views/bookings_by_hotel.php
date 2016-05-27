@@ -12,19 +12,19 @@
     <table class="hotels">
         <thead>
           <tr>
-              <td>Номер брони</td>
-              <td>Дата заезда</td>
-              <td>Дата выезда</td>
-              <td>Гость</td>
-              <td>Контакты гостя</td>
-              <td>Общая стоимость</td>
-              <td>Сумма предоплаты</td>
-              <td>Дата предоплаты</td>
-              <td>Комментарии</td>
-              <td>БВ</td>
-              <td>Бронь установил</td>
-              <td>Дата/время брони</td>
-              <td>Действия</td>
+              <th>Номер брони</th>
+              <th>Дата заезда</th>
+              <th>Дата выезда</th>
+              <th>Гость</th>
+              <th>Контакты гостя</th>
+              <th>Общая стоимость</th>
+              <th>Сумма предоплаты</th>
+              <th>Дата предоплаты</th>
+              <th>Комментарии</th>
+              <th>БВ</th>
+              <th>Бронь установил</th>
+              <th>Дата/время брони</th>
+              <th>Действия</th>
           </tr>
         </thead>
         <tbody><?php
@@ -39,7 +39,7 @@
                       echo "<td class=\"numeric\">".$row['beforepaysum']."</td>";
                       echo "<td>".substr($row['beforepaydate'], -2)."-".substr($row['beforepaydate'], 5, 2)."-".substr($row['beforepaydate'], 0, 4)."</td>";
                       echo "<td>".$row['comments']."</td>";
-                      echo "<td>".$row['byowner']."</td>";
+                      echo "<td>".(($row['byowner'] == "on") ? "+": "")."</td>";
                       echo "<td>".$row['userlogin']."</td>";
                       echo "<td>".$row['bookingtimestamp']."</td>";
                       echo "<td>";
