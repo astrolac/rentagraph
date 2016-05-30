@@ -52,6 +52,7 @@ class Authoz extends CI_Controller {
             unset($_SESSION['username']);
             unset($_SESSION['role']);
             unset($_SESSION['mainmenuarray']);
+            unset($_SESSION['scope']);
             $_SESSION['logon'] = FALSE;
             $this->session->sess_destroy();
             $this->load->helper('url');

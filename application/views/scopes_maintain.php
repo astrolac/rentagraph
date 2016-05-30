@@ -34,8 +34,10 @@
                   echo "<td>".$row['uid']."</td>";
                   echo "<td>".$row['title']."</td>";
                   echo "<td>";
-                  echo "[<a href=\"$editref".$row['uid']."\">Изменить</a>]";
-                  echo "[<a href=\"$delref".$row['uid']."\">Удалить</a>]";
+                  if($row['uid'] != 1) {
+                      echo "[<a href=\"$editref".$row['uid']."\">Изменить</a>]";
+                      echo "[<a href=\"$delref".$row['uid']."\">Удалить</a>]";
+                  }
                   echo "</td>";
               echo "</tr>";
           }

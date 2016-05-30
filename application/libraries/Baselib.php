@@ -84,7 +84,7 @@ class Baselib {
     public function get_hnames($allall = FALSE) {
         if($allall) {
           /* Загрузим отели для отображения. */
-            $allhotels = $this->CI->hotels_model->get_allall_hotels();
+            $allhotels = $this->CI->hotels_model->get_hotels(FALSE,FALSE);/*get_allall_hotels();*/
         } else {
           /* Загрузим отели для отображения. */
             $allhotels = $this->CI->hotels_model->get_hotels(FALSE, 1);
@@ -131,7 +131,7 @@ class Baselib {
         */
             if($allall) {
               /* Загрузим отели для отображения. */
-                $allhotels = $this->CI->hotels_model->get_allall_hotels();
+                $allhotels = $this->CI->hotels_model->get_hotels(FALSE,FALSE);/*get_allall_hotels();*/
             } else {
               /* Загрузим отели для отображения. */
                 $allhotels = $this->CI->hotels_model->get_hotels(FALSE, 1);

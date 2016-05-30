@@ -30,8 +30,10 @@
                   echo "<td class=\"sign\">".(($row['bcontrol']) ? "+" : "-")."</td>";
                   echo "<td class=\"sign\">".(($row['ownbonly']) ? "+" : "-")."</td>";
                   echo "<td>";
-                  echo "[<a href=\"$urefedit".$row['uid']."\">Параметры</a>]";
-                  echo "[<a href=\"$urefdel".$row['uid']."\">Удалить</a>]";
+                  if($row['uid'] != 1) {
+                      echo "[<a href=\"$urefedit".$row['uid']."\">Параметры</a>]";
+                      echo "[<a href=\"$urefdel".$row['uid']."\">Удалить</a>]";
+                  }
                   echo "</td>";
               echo "</tr>";
           }

@@ -20,7 +20,13 @@
       <?php
       foreach ($inscope as $row) { ?>
         <tr>
-          <td class="label"><?php echo $row['hname']; ?></td>
+          <td class="label"><?php
+              if($row['isactive'] == 1) {
+                  echo $row['hname'];
+              } else {
+                  echo "<del>".$row['hname']."</del>";
+              }
+          ?></td>
           <td class="input"><input type="checkbox" name="<?php echo $row['uid']; ?>" checked /></td>
         </tr>
       <?php }  ?>
@@ -36,7 +42,13 @@
       <?php
       foreach ($notinscope as $row) { ?>
         <tr>
-          <td class="label"><?php echo $row['hname']; ?></td>
+          <td class="label"><?php
+              if($row['isactive'] == 1) {
+                  echo $row['hname'];
+              } else {
+                  echo "<del>".$row['hname']."</del>";
+              }
+          ?></td>
           <td class="input"><input type="checkbox" name="<?php echo $row['uid']; ?>" /></td>
         </tr>
       <?php }  ?>
