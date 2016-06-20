@@ -121,7 +121,7 @@ class Hotels_model extends CI_Model {
     }
 
     /*
-        Функция получения всех ативных броней отеля за заданный период.
+        Функция получения всех активных броней отеля за заданный период.
         Если период не задан, то выдает все активные брони отеля.
         Если задано только начало или конец периода, выдает с
         соответствующими ограничениями.
@@ -141,7 +141,7 @@ class Hotels_model extends CI_Model {
         if ($buid) {
             $querystr .=" AND uid<>".$buid;
         }
-        $querystr .=" ORDER BY datein DESC;";
+        $querystr .=" ORDER BY datein ASC;";
         $query = $this->db->query($querystr);
         return $query->result_array();
     }

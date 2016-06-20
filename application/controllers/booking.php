@@ -320,7 +320,6 @@ class Booking extends CI_Controller {
                     $bookinginfo['datein'] = $this->input->post('datein');
                     $bookinginfo['dateout'] = $this->input->post('dateout');
                     $bookinginfo['beforepaydate'] = $this->input->post('beforepaydate');
-
                   /*  Теперь сформируем сам массив для отображения ошибки. */
                     $errorinfo = array (
                         'etext' => 'Дата заезда раньше даты выезда!',
