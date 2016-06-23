@@ -26,30 +26,44 @@
       </thead>
       <tbody>
 
-        <?php function showhdata($huid, $datesarray, $finish) {
+        <?php function showhdata($huid, $datesarray, $finish, $baseurl) {
           foreach ($datesarray as $dateitem) {
             echo "<td class=\"booking\" style=\"min-width: 40px; height: 40px;";
-                $resstr = "";
+                  $resstr = "";
+              /*  Проверим сколько параметров нам передано. Если один, то значит на эту дату только одна бронь начинается/заканчивается,
+                  если 2, то в этот день одна бронь заканчивается, а другая начинается.*/
                 switch(count($finish[$huid][$dateitem])) {
                     case 1:   echo "background-color: lime;\">";
+                             /*  Сначала добавим начальный тег для ссылки отображения брони. */
+                              $resstr .= "<a href=\"".$baseurl."index.php/booking/booking_edit/".$finish[$huid][$dateitem][0]['buid']."\">";                            /*  Теперь вставим или чистый номер брони, или с добавкой признака брони владельца. */
                               if($finish[$huid][$dateitem][0]['byowner'] == 'on') {
-                                  $resstr = $finish[$huid][$dateitem][0]['buid']."(БВ)";
+                                  $resstr .= $finish[$huid][$dateitem][0]['buid']."(БВ)";
                               } else {
-                                  $resstr = $finish[$huid][$dateitem][0]['buid'];
+                                  $resstr .= $finish[$huid][$dateitem][0]['buid'];
                               }
+                            /*  Закрывающий тег ссылки. */
+                              $resstr .= "</a>";
                               break;
                     case 2:   echo "background-color: lime;\">";
+                             /*  Сначала добавим начальный тег для ссылки отображения брони. */
+                              $resstr .= "<a href=\"".$baseurl."index.php/booking/booking_edit/".$finish[$huid][$dateitem][0]['buid']."\">";                            /*  Теперь вставим или чистый номер брони, или с добавкой признака брони владельца. */
                               if($finish[$huid][$dateitem][0]['byowner'] == 'on') {
-                                  $resstr = "<u>".$finish[$huid][$dateitem][0]['buid']."(БВ)</u>";
+                                  $resstr .= $finish[$huid][$dateitem][0]['buid']."(БВ)";
                               } else {
-                                  $resstr = "<u>".$finish[$huid][$dateitem][0]['buid']."</u>";
+                                  $resstr .= $finish[$huid][$dateitem][0]['buid'];
                               }
-                              $resstr .= "<br />";
+                            /*  Закрывающий тэг для ссылки и перенос строки. */
+                              $resstr .= "</a>";
+                              $resstr .= "<hr class=\"inbooktab\">";
+                            /*  Теперь откроем вторую ссылку. */
+                              $resstr .= "<a href=\"".$baseurl."index.php/booking/booking_edit/".$finish[$huid][$dateitem][1]['buid']."\">";
                               if($finish[$huid][$dateitem][1]['byowner'] == 'on') {
                                   $resstr .= $finish[$huid][$dateitem][1]['buid']."(БВ)";
                               } else {
                                   $resstr .= $finish[$huid][$dateitem][1]['buid'];
                               }
+                            /*  Закрывающий тег ссылки. */
+                              $resstr .= "</a>";
                               break;
                     case 0:   echo "border: 1px solid black;\">";
                               break;
@@ -61,7 +75,13 @@
           }
         } ?>
 
-          <?php foreach ($hotelsname as $huid => $hnamedata) { ?>
+          <?php
+        /*  Для каждого переданного нам отеля проверим есть ли у него дочернии отели. Если нет, то просто обрамляем его в ссылку
+            для отображения всех броней отеля. Если есть, то для родителя ссылку не делаем, но следом выводим все дочернии и уже
+            дочернии обрамляем в ссылку.
+            Для каждого отеля обрамлённого в ссылку запускаем функцию отображения его данных о бронях.
+        */
+          foreach ($hotelsname as $huid => $hnamedata) { ?>
           <tr>
               <?php if(count($hnamedata['chotels']) == 0) { ?>
                   <td style="min-width: 250px;" colspan="2">
@@ -69,7 +89,7 @@
                           echo $this->config->item('base_url')."index.php/booking/bookings_by_hotel/".$huid;
                           ?>"><?php echo $hnamedata['hname']; ?></a>
                   </td>
-                  <?php showhdata($huid, $datesarray, $finish);
+                  <?php showhdata($huid, $datesarray, $finish, $this->config->item('base_url'));
                   } else { ?>
                     <td style="min-width: 230px;" colspan="2">
                         <b><?php echo $hnamedata['hname']; ?></b>
@@ -86,7 +106,7 @@
                                 echo $this->config->item('base_url')."index.php/booking/bookings_by_hotel/".$chuid;
                                 ?>"><?php echo $chnamedata; ?></a>
                         </td>
-                        <?php showhdata($chuid, $datesarray, $finish); ?>
+                        <?php showhdata($chuid, $datesarray, $finish, $this->config->item('base_url')); ?>
                     </tr>
                   <?php } ?>
                 <?php } ?>

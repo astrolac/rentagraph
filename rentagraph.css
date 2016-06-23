@@ -106,6 +106,13 @@ table.bookings {
   width: 95%;
 }
 
+hr.inbooktab {
+    border: 0;
+    border-bottom: 1px solid #000;
+    background: #fff;
+    width: 70%;
+}
+
 table.hotels tbody tr {
   background: #e0e0e0;
 }

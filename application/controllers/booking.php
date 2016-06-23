@@ -35,9 +35,8 @@ class Booking extends CI_Controller {
             $hotelsname = $this->baselib->get_hnames();
           /*  Получим период всех активных броней. */
             $period = $this->hotels_model->get_active_bookings_period();
-
+          /*  Загрузим хелпер дат. */
             $this->load->helper('date');
-
           /*  2016-04-22 По просьбе заказчика ограничиваем начало периода вчерашним днем. */
           /*  Получим текущую Unix метку времени. */
             $unixtime = time();
@@ -160,7 +159,7 @@ class Booking extends CI_Controller {
             $data['title'] = "Выберете отель";
           /*  Получим имена отелей для отображения. */
             $data['hnames'] = $this->baselib->get_hnames();
-/*
+          /*
             $hdata = $this->baselib->get_hotels_data();
             $data['hdata'] = array ();
             foreach($hdata as $hrow) {
