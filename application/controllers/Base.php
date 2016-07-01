@@ -332,6 +332,116 @@ class Base extends CI_Controller {
         }
     }
 
+    public function show_busy($hotel, $month = FALSE, $year = FALSE) {
+        if(!($month && $year)) {
+            $month = date('n');
+            $year = date('Y');
+        }
+        if($hotel) {
+            echo '<html><head><meta charset="utf-8" /><style>';
+            echo 'table.calendar { border-left:1px solid #999; font-family: Calibri, Helvetica, Verdana, Arial; } ';
+            echo 'tr.calendar-row { height: 30px; } ';
+            echo 'td.calendar-day { min-height:80px; font-size:11px; position:relative; } * html div.calendar-day { height:80px; } ';
+            echo 'td.calendar-day:hover  { background:#eceff5; } ';
+            echo 'td.calendar-day-np { background:#eee; min-height:80px; } * html div.calendar-day-np { height:80px; } ';
+            echo 'td.calendar-day-head { background:#ccc; font-weight:bold; text-align:center; width:30px; padding:5px; border-bottom:1px solid #999; border-top:1px solid #999; border-right:1px solid #999; } ';
+            echo 'div.day-number { background:#999; padding:5px; color:#fff; font-weight:bold; float:right; margin:-5px -5px 0 0; width:20px; text-align:center; } ';
+            echo 'td.calendar-day, td.calendar-day-np { width:30px; padding:5px; border-bottom:1px solid #999; border-right:1px solid #999; }';
+            echo '</style></head><body>';
+
+            /* Начало таблицы */
+            $calendar = '<table cellpadding="0" cellspacing="0" class="calendar">';
+            /* Заглавия в таблице */
+            $headings = array('Пн','Вт','Ср','Чт','Пт','Сб','Вс');
+            $calendar.= '<tr class="calendar-row"><td class="calendar-day-head">'.implode('</td><td class="calendar-day-head">',$headings).'</td></tr>';
+            /* необходимые переменные дней и недель... */
+            $running_day = date('w',mktime(0,0,0,$month,1,$year));
+            $running_day = $running_day - 1;
+            $days_in_month = date('t',mktime(0,0,0,$month,1,$year));
+            $days_in_this_week = 1;
+            $day_counter = 0;
+            $dates_array = array();
+            /* первая строка календаря */
+            $calendar.= '<tr class="calendar-row">';
+            /* вывод пустых ячеек в сетке календаря */
+            for($x = 0; $x < $running_day; $x++) {
+              $calendar.= '<td class="calendar-day-np"> </td>';
+              $days_in_this_week++;
+            }
+
+          /*  Вот здесь выгребем все брони заданного отеля попадающие в текущий месяц.
+              Далее для каждой брони сформируем диапазон дат и всё сведём в один массив.
+              Затем при формировании DIVа с датой будем проверять не попадает ли эта дата в наш массив
+              и если попадает, то просто подменим цвет фона у DIVа. */
+            $this->load->helper('date');
+            $finaldaterange = [];
+            $hotelbookings = $this->hotels_model->get_bookings($hotel, $year.'-'.$month.'-01', $year.'-'.$month.'-'.$days_in_month);
+            /*  Далее, для каждой брони текущего отеля ... */
+            foreach($hotelbookings as $currentbooking) {
+                /*  Получим диапазон дат текущей брони. */
+                $bookingdaterange = date_range($currentbooking['datein'], $currentbooking['dateout']);
+                /*  Для каждой даты полученного диапазона ... */
+                foreach($bookingdaterange as $currentdate) {
+                    $finaldaterange[] = $currentdate;
+                }
+            }
+
+            /* дошли до чисел, будем их писать в первую строку */
+            for($list_day = 1; $list_day <= $days_in_month; $list_day++) {
+              $calendar.= '<td class="calendar-day">';
+                /* Пишем номер в ячейку */
+                /*  Вот здесь будем определять попадает ткущая дата в занятые или нет. */
+                $dayin = FALSE;
+                foreach ($finaldaterange as $currentday) {
+                    if($year.'-'.((strlen(''.$month) == 2) ? $month : '0'.$month).'-'.((strlen(''.$list_day) == 2) ? $list_day : '0'.$list_day) == $currentday) {
+                        $dayin = TRUE;
+                    }
+                }
+                /*  Соответственно если попадает, то подменим фон на красный. */
+                if ($dayin) {
+                    $calendar.= '<div style="background:rgb(255,0,0);"';
+                } else {
+                    $calendar.= '<div ';
+                }
+                $calendar .= 'class="day-number">'.$list_day.'</div>';
+
+                /** ЗДЕСЬ МОЖНО СДЕЛАТЬ MySQL ЗАПРОС К БАЗЕ ДАННЫХ! ЕСЛИ НАЙДЕНО СОВПАДЕНИЕ ДАТЫ СОБЫТИЯ С ТЕКУЩЕЙ - ВЫВОДИМ! **/
+                $calendar.= str_repeat('<p> </p>',2);
+
+              $calendar.= '</td>';
+              if($running_day == 6) {
+                $calendar.= '</tr>';
+                if(($day_counter+1) != $days_in_month) {
+                  $calendar.= '<tr class="calendar-row">';
+                }
+                $running_day = -1;
+                $days_in_this_week = 0;
+              }
+              $days_in_this_week++; $running_day++; $day_counter++;
+            }
+            /* Выводим пустые ячейки в конце последней недели */
+            if($days_in_this_week < 8) {
+              for($x = 1; $x <= (8 - $days_in_this_week); $x++) {
+                $calendar.= '<td class="calendar-day-np"> </td>';
+              }
+            }
+            /* Закрываем последнюю строку */
+            $calendar.= '</tr>';
+            /* Закрываем таблицу */
+            $calendar.= '</table>';
+
+            /* СПОСОБ ПРИМЕНЕНИЯ */
+            echo $calendar;
+            echo '</body>';
+            echo '<script type="text/javascript">';
+              echo 'var currentMonth = ' . $month . '; ' ;
+              echo 'var currentYear = ' . $year . '; ' ;
+              //echo 'window.setTimeout(function () { window.location.assign("'.$this->config->item('base_url').'index.php/base/show_busy/1/" + (currentMonth + 1) + "/" + currentYear); }, 1000)';
+            echo '</script>';
+            echo '</html>';
+        }
+    }
+
     /*
         Функция отображения сообщений об ошибках.
     */

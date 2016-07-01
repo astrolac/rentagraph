@@ -62,6 +62,7 @@ $route['booking/bookings_show'] = 'booking/bookings_show';
 $route['base/hotelsadd_job'] = 'base/hotelsadd_job';
 $route['base/hotelsadd'] = 'base/hotelsadd';
 $route['base/hotelsmaintain'] = 'base/hotelsmaintain';
+$route['base/show_busy'] = 'base/show_busy';
 
 $route['authoz/auth_test'] = 'authoz/auth_test';
 
