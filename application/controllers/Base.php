@@ -343,6 +343,7 @@ class Base extends CI_Controller {
         if($hotel) {
             echo '<html><head><meta charset="utf-8" /><style>';
             echo 'table.calendar { border-left:1px solid #999; font-family: Calibri, Helvetica, Verdana, Arial; } ';
+            echo 'table.calendarout { font-family: Calibri, Helvetica, Verdana, Arial; } ';
             echo 'tr.calendar-row { height: 30px; } ';
             echo 'table.calendar tr { height: 30px; } ';
             echo 'td.calendar-day { min-height:80px; font-size:11px; position:relative; } * html div.calendar-day { height:80px; } ';
@@ -356,7 +357,7 @@ class Base extends CI_Controller {
             echo '.button:focus:not(:active) { border: 1px solid rgb(22,32,43); border-bottom: 1px solid rgb(25,34,45); background: rgb(53,61,71); box-shadow: inset 0 1px 3px rgba(0,10,20,.5), 0 1px rgb(83,94,104), 0 0 1px rgb(86,96,106); pointer-events: none; }';
             echo '</style></head><body align="center">';
 
-            echo '<table width="280px">';
+            echo '<table class="calendarout" width="280px">';
             echo '<tr>';
             echo '<td align="left"><button class="button" onclick="prevMonth()"><</button></td>';
             echo '<td align="center"><b>';
@@ -508,6 +509,7 @@ class Base extends CI_Controller {
             echo 'table.calendar { border-left:1px solid #999; font-family: Calibri, Helvetica, Verdana, Arial; } ';
             echo 'tr.calendar-row { height: 30px; } ';
             echo 'table.calendar tr { height: 30px; } ';
+            echo 'table.calendarout { font-family: Calibri, Helvetica, Verdana, Arial; } ';
             echo 'td.calendar-day { min-height:80px; font-size:11px; position:relative; } * html div.calendar-day { height:80px; } ';
             echo 'td.calendar-day:hover  { background:#eceff5; } ';
             echo 'td.calendar-day-np { background:#eee; min-height:80px; } * html div.calendar-day-np { height:80px; } ';
@@ -519,7 +521,7 @@ class Base extends CI_Controller {
             echo '.button:focus:not(:active) { border: 1px solid rgb(22,32,43); border-bottom: 1px solid rgb(25,34,45); background: rgb(53,61,71); box-shadow: inset 0 1px 3px rgba(0,10,20,.5), 0 1px rgb(83,94,104), 0 0 1px rgb(86,96,106); pointer-events: none; }';
             echo '</style></head><body align="center">';
 
-            echo '<table>';
+            echo '<table class="calendarout">';
             echo '<tr>';
             echo '<td align="left" width="150px"><button class="button" onclick="prevMonth()"><</button></td>';
             echo '<td align="center"><b>';
