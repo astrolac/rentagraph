@@ -41,7 +41,7 @@ class Hotels_model extends CI_Model {
     /*  Получает все отели независимо от isactive и т.д. */
     /*  2016-05-28
           Чтобы обеспечить корректную работу в пределах областей видимости,
-          при этом ... не переиграл все через get_hotels ... :) */
+          при этом ... неа, переиграл все через get_hotels ... :) */
     public function get_allall_hotels() {
         $querystr = "SELECT * FROM hotels ORDER BY hname";
         $query = $this->db->query($querystr);

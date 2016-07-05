@@ -332,6 +332,9 @@ class Base extends CI_Controller {
         }
     }
 
+    /*
+        Функция отображения занятости отеля в iframe. Сделана для отображения занятости на сторонних системах.
+    */
     public function show_busy($hotel, $month = FALSE, $year = FALSE) {
         if(!($month && $year)) {
             $month = date('n');
@@ -491,6 +494,170 @@ class Base extends CI_Controller {
         return $calendar;
     }
 
+    /*
+        Функция отображения занятости отеля в iframe. Сделана для отображения занятости на сторонних системах.
+        Отдельная функция для отображения дочерних отелей.
+    */
+    public function show_busy2($hotel, $month = FALSE, $year = FALSE) {
+        if(!($month && $year)) {
+            $month = date('n');
+            $year = date('Y');
+        }
+        if($hotel) {
+            echo '<html><head><meta charset="utf-8" /><style>';
+            echo 'table.calendar { border-left:1px solid #999; font-family: Calibri, Helvetica, Verdana, Arial; } ';
+            echo 'tr.calendar-row { height: 30px; } ';
+            echo 'table.calendar tr { height: 30px; } ';
+            echo 'td.calendar-day { min-height:80px; font-size:11px; position:relative; } * html div.calendar-day { height:80px; } ';
+            echo 'td.calendar-day:hover  { background:#eceff5; } ';
+            echo 'td.calendar-day-np { background:#eee; min-height:80px; } * html div.calendar-day-np { height:80px; } ';
+            echo 'td.calendar-day-head { background:#ccc; font-weight:bold; text-align:center; width:30px; padding:5px; border-bottom:1px solid #999; border-top:1px solid #999; border-right:1px solid #999; } ';
+            echo 'div.day-number { background:#999; padding:5px; color:#fff; font-weight:bold; float:right; margin:-5px -5px 0 0; width:20px; text-align:center; } ';
+            echo 'td.calendar-day, td.calendar-day-np { width:30px; padding:5px; border-bottom:1px solid #999; border-right:1px solid #999; }';
+            echo '.button { display: inline-block; font-family: arial,sans-serif; font-size: 11px; color: rgb(205,216,228); text-shadow: 0 -1px rgb(46,53,58); text-decoration: none; user-select: none; line-height: 2em; padding: 1px 1.2em; outline: none; border: 1px solid rgba(33,43,52,1); border-radius: 3px; background: rgb(81,92,102) linear-gradient(rgb(81,92,102), rgb(69,78,87)); box-shadow: inset 0 1px rgba(101,114,126,1), inset 0 0 1px rgba(140,150,170,.8), 0 1px rgb(83,94,104), 0 0 1px rgb(86,96,106); } ';
+            echo '.button:active { box-shadow: inset 0 1px 3px rgba(0,10,20,.5), 0 1px rgb(83,94,104), 0 0 1px rgb(86,96,106); }';
+            echo '.button:focus:not(:active) { border: 1px solid rgb(22,32,43); border-bottom: 1px solid rgb(25,34,45); background: rgb(53,61,71); box-shadow: inset 0 1px 3px rgba(0,10,20,.5), 0 1px rgb(83,94,104), 0 0 1px rgb(86,96,106); pointer-events: none; }';
+            echo '</style></head><body align="center">';
+
+            echo '<table>';
+            echo '<tr>';
+            echo '<td align="left" width="150px"><button class="button" onclick="prevMonth()"><</button></td>';
+            echo '<td align="center"><b>';
+                switch($month) {
+                  case 1: $monthname = "Январь";
+                          break;
+                  case 2: $monthname = "Февраль";
+                          break;
+                  case 3: $monthname = "Март";
+                          break;
+                  case 4: $monthname = "Апрель";
+                          break;
+                  case 5: $monthname = "Май";
+                          break;
+                  case 6: $monthname = "Июнь";
+                          break;
+                  case 7: $monthname = "Июль";
+                          break;
+                  case 8: $monthname = "Август";
+                          break;
+                  case 9: $monthname = "Сентябрь";
+                          break;
+                  case 10: $monthname = "Октябрь";
+                          break;
+                  case 11: $monthname = "Ноябрь";
+                          break;
+                  case 12: $monthname = "Декабрь";
+                          break;
+                }
+            echo $monthname." ".$year;
+            echo '</b></td>';
+            echo '<td align="right"><button class="button" onclick="nextMonth()">></button></td>';
+            echo '</tr>';
+
+            /* СПОСОБ ПРИМЕНЕНИЯ */
+
+            $chotels = $this->hotels_model->get_chotels($hotel, TRUE);
+            
+            foreach ($chotels as $chotel) {
+                echo '<tr>';
+                echo '<td width="150px">'.$chotel['hname'].'</td>';
+                echo '<td colspan="2">';
+                $calendar = $this->get_calendar_in_line($chotel['uid'], $month, $year);
+                echo $calendar;
+                echo '</td></tr>';
+            }
+            //echo '</table>';
+            echo '</table>';
+            echo '</body>';
+            echo '<script type="text/javascript">';
+              echo 'var currentMonth = ' . $month . '; ';
+              echo 'var currentYear = ' . $year . '; ';
+              echo 'function nextMonth() { if((currentMonth + 1) > 12) { currentMonth = 1; currentYear++; } else { currentMonth++; } window.location.assign("'.$this->config->item('base_url').'index.php/base/show_busy2/'.$hotel.'/" + currentMonth + "/" + currentYear); }';
+              echo 'function prevMonth() { if((currentMonth - 1) < 1) { currentMonth = 12; currentYear--; } else { currentMonth--; } window.location.assign("'.$this->config->item('base_url').'index.php/base/show_busy2/'.$hotel.'/" + currentMonth + "/" + currentYear); }';
+            echo '</script>';
+            echo '</html>';
+        }
+    }
+
+    public function get_calendar_in_line($hotel, $month, $year) {
+        /* Начало таблицы */
+        $calendar = '<table cellpadding="0" cellspacing="0" class="calendar">';
+        /* Заглавия в таблице */
+        
+        $days_in_month = date('t', mktime(0, 0, 0, $month, 1, $year));
+        $running_day = date('w', mktime(0, 0, 0, $month, 1, $year));
+
+        /*  Так как здесь не важно начинать массив с понедельника и в связи с тем, что день недели первого дня месяца
+            мы определяем по функции date, а у неё 0 это воскресенье, то порядок дней недели в массиве с наименованиями
+            дней недели сделаем по американски, т.е. начнём с воскресенья. */
+        $headings = array('Вс','Пн','Вт','Ср','Чт','Пт','Сб');
+        $daywc = $running_day;
+        $calendar .= '<tr class="calendar-row">';
+        for ($dayc = 0; $dayc < $days_in_month; $dayc++) {                
+            $calendar .= '<td class="calendar-day-head">'.$headings[$daywc].'</td>';
+            ($daywc == 6) ? $daywc = 0 : $daywc++ ;
+        }
+        $calendar .= '</tr>';
+        /* необходимые переменные дней и недель... */
+        $running_day = date('w',mktime(0,0,0,$month,1,$year));
+        if(($running_day - 1) < 0) { $running_day = 6; } else { $running_day = $running_day - 1; }
+        
+        $days_in_this_week = 1;
+        $day_counter = 0;
+        $dates_array = array();
+        /* первая строка календаря */
+        $calendar.= '<tr class="calendar-row">';
+
+      /*  Вот здесь выгребем все брони заданного отеля попадающие в текущий месяц.
+          Далее для каждой брони сформируем диапазон дат и всё сведём в один массив.
+          Затем при формировании DIVа с датой будем проверять не попадает ли эта дата в наш массив
+          и если попадает, то просто подменим цвет фона у DIVа. */
+        $this->load->helper('date');
+        $finaldaterange = [];
+        $hotelbookings = $this->hotels_model->get_bookings($hotel, $year.'-'.$month.'-01', $year.'-'.$month.'-'.$days_in_month);
+        /*  Далее, для каждой брони текущего отеля ... */
+        foreach($hotelbookings as $currentbooking) {
+            /*  Получим диапазон дат текущей брони. */
+            $bookingdaterange = date_range($currentbooking['datein'], $currentbooking['dateout']);
+            /*  Для каждой даты полученного диапазона ... */
+            foreach($bookingdaterange as $currentdate) {
+                $finaldaterange[] = $currentdate;
+            }
+        }
+
+        /* дошли до чисел, будем их писать в первую строку */
+        for($list_day = 1; $list_day <= $days_in_month; $list_day++) {
+          $calendar.= '<td class="calendar-day">';
+            /* Пишем номер в ячейку */
+            /*  Вот здесь будем определять попадает текущая дата в занятые или нет. */
+            $dayin = FALSE;
+            foreach ($finaldaterange as $currentday) {
+                if($year.'-'.((strlen(''.$month) == 2) ? $month : '0'.$month).'-'.((strlen(''.$list_day) == 2) ? $list_day : '0'.$list_day) == $currentday) {
+                    $dayin = TRUE;
+                }
+            }
+            /*  Соответственно если попадает, то подменим фон на красный. */
+            if ($dayin) {
+                $calendar.= '<div style="background:rgb(255,0,0);"';
+            } else {
+                $calendar.= '<div ';
+            }
+            $calendar .= 'class="day-number">'.$list_day.'</div>';
+
+            /** ЗДЕСЬ МОЖНО СДЕЛАТЬ MySQL ЗАПРОС К БАЗЕ ДАННЫХ! ЕСЛИ НАЙДЕНО СОВПАДЕНИЕ ДАТЫ СОБЫТИЯ С ТЕКУЩЕЙ - ВЫВОДИМ! **/
+            $calendar.= str_repeat('<p> </p>',2);
+
+          $calendar.= '</td>';
+
+          $days_in_this_week++; $running_day++; $day_counter++;
+        }
+        /* Закрываем последнюю строку */
+        $calendar.= '</tr>';
+        /* Закрываем таблицу */
+        $calendar.= '</table>';
+
+        return $calendar;
+    }
 
     /*
         Функция отображения сообщений об ошибках.
